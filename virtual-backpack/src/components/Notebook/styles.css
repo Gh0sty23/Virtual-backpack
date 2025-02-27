@@ -1,0 +1,25 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .full-screen-form {
+    width: 500px;  
+    height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    justify-content: start; /* Aligns content to the top */
+    align-items: left; /* Aligns content to the left */
+    background-color: #f8f9fa; 
+    padding: 20px; /* Adds space from edges */
+  }
+  
+  .full-width-input {
+    width: 500px; /* Adjust width */
+    height: 500px; /* Adjust height */
+    font-size: 1.2rem; 
+    padding: 10px;
+  }
+  
