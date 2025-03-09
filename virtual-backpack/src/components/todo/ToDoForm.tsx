@@ -16,7 +16,7 @@ function ToDoForm({addTodo}) {
     const [name, setName] = useState("");
     const [priority, setPriority] = useState("");
     const [date, setDate] = useState("");
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: { currentTarget: any; preventDefault: () => void; stopPropagation: () => void; }) => {
       const form = e.currentTarget;
       e.preventDefault();
 

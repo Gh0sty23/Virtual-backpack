@@ -1,11 +1,11 @@
 import { useEffect, useId, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import 'bootstrap/dist/css/bootstrap.css'
-import ToDoForm from './components/ToDoForm'
-import ToDo from './components/ToDo'
+import ToDoForm from './ToDoForm'
+import ToDo from './ToDo'
 import { Button, Col, Container, Row, Stack } from 'react-bootstrap'
 import React from 'react'
-import ToDoWrapper from './components/ToDoWrapper'
+import ToDoWrapper from './ToDoWrapper'
 
 
 function App() {
@@ -30,23 +30,23 @@ function App() {
       setTodos(savedTodos);
   }, []);
 
-  const toggleComplete = id => {
+  const toggleComplete = (id: any) => {
     const newTodos = todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo);
     setTodos(newTodos);
     localStorage.setItem('todos', JSON.stringify(newTodos));
   }
 
-  const deleteTodo = id => {
+  const deleteTodo = (id: any) => {
       const newTodos = todos.filter(todo => todo.id !== id);
       setTodos(newTodos);
       localStorage.setItem('todos', JSON.stringify(newTodos));
   }
 
-  const editTodo = id => {
+  const editTodo = (id: any) => {
     setTodos(todos.map(todo => todo.id === id ? {...todo, isEditing: !todo.isEditing} : todo));
   }
 
-  const editTask = (taskName, taskPriority, taskDate, id) => {
+  const editTask = (taskName: any, taskPriority: any, taskDate: any, id: any) => {
     const newTodos = todos.map(todo => todo.id === id ? {...todo, taskName, taskPriority, taskDate, isEditing: !todo.isEditing} : todo);
     setTodos(newTodos);
     localStorage.setItem('todos', JSON.stringify(newTodos));
