@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import './App.css'
 import Sidebar from './components/Sidebar/Sidebar.tsx'
 import ToDoApp from "./components/todo/ToDoComponent.tsx"
-import Calendar from "./components/Calendar/Calendar.tsx"
 import {v4 as uuidV4} from "uuid";
 import CalendarApp from "./components/Calendar/CalendarApp.tsx"
 import { useMemo } from "react"
