@@ -36,8 +36,6 @@ export type Tag = {
   label: string
 }
 
->>>>>>> MODULE-LINKING
-
 function App() {
 
   const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
