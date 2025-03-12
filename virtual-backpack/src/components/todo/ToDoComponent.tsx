@@ -53,8 +53,8 @@ function App() {
   }
 
   return (
-    <div className = "bg-secondary p-3 min-vw-100 min-vh-100 mx-auto container">
-      <Stack className = "bg-secondary p-3 min-vw-98 mx-auto" direction="horizontal" gap={1}>
+    <div className = "p-3 w-100 h-100 container">
+      <Stack className = "p-3 w-100" direction="horizontal" gap={5}>
         <div className='mx-auto'><ToDoWrapper todos={todos} head = "Today" toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/></div>
         <div className='mx-auto'><ToDoWrapper todos={todos} head = "Upcoming" toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/></div>
         <div className='mx-auto'><ToDoWrapper todos={todos} head = "Missed" toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/></div>

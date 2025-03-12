@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Button, Form, Col, Row, Stack, Card, Badge, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactSelect from "react-select"
-import { Tag } from "./NoteApp";
+import { Tag } from "../../App";
 import styles from "./NotesList.module.css"
 
 type SimplifiedNote ={
@@ -42,7 +42,7 @@ export function NoteList({availableTags, notes, onUpdateTag, onDeleteTag}:NoteLi
     })
   }, [title, selectedTags, notes])
     return<>
-        <Row className="allign-items-center mb-4">
+        <Row className="align-items-center mb-4">
             <Col><h1>Notes</h1></Col>
             <Col xs="auto">
                 <Stack gap={2} direction="horizontal">
@@ -84,7 +84,7 @@ export function NoteList({availableTags, notes, onUpdateTag, onDeleteTag}:NoteLi
 
             </Row>
         </Form>
-        <Row xs={1} sm={2}lg ={3} xl ={4} className="g-3">
+        <Row xs={1} sm={2}lg ={3} xl ={4} className="g-4">
             {filteredNotes.map(note=>(
                 <Col key ={note.id}>
                     <NoteCard id={note.id} title={note.title} tags= {note.tags}/>
@@ -109,11 +109,10 @@ function NoteCard({id,title,tags}: SimplifiedNote){
         className={`h-100 text-reset text-decoration ${styles.card}`}>
         <Card.Body>
             <Stack gap={2} 
-            className="align-items-center 
-            justify-content-center h-100">
-                <span className="fs-5">{title}</span>
+            className="align-items-center justify-content-center h-100">
+                <span className="fs-4 text-justify">{title}</span>
                 {tags.length >0 && (
-                    <Stack gap={1} direction ="horizontal"
+                    <Stack gap={1} direction ="vertical"
                     className="justify-content-center flex-wrap">
                         {tags.map(tag => (
                             <Badge
@@ -154,7 +153,7 @@ function EditTagsModal({
 
                             </Col>
                             <Col xs="auto">
-                                <Button onClick ={() => onDeleteTag(tag.id)}variant="outline-dager">
+                                <Button onClick ={() => onDeleteTag(tag.id)}variant="outline-danger">
                                     &times;
                                 </Button>
                             </Col>

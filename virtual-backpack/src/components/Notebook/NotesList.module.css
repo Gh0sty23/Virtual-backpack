@@ -1,9 +1,9 @@
 .card {
-    transition: translate ease-in-out 100ms, box-shadow ease-in-out 100 ms
+    transition: translate ease-in-out 100ms, box-shadow ease-in-out 100 ms;
  }
 
 .card:hover,
 .card:focus{
     translate: 0 -5px;
-    box-shadow: 0 5 px 8px 0 rgba(0,0,0,.2)
+    box-shadow: 0 5px 8px 0 rgba(0,0,0,.2);
 }
