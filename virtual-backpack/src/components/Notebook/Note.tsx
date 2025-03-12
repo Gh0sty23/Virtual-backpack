@@ -39,11 +39,11 @@ export function Note({onDelete}: NoteProps){
                    </Link> 
                     <Button onClick={() => {
                         onDelete(note.id)
-                        navigate(("/"))
+                        navigate(("/notes"))
                     }} variant="outline-danger">
                         Delete
                     </Button>
-                    <Link to ="/">
+                    <Link to ="/notes">
                         <Button variant="outline-secondary">Back</Button>
                     </Link>
 

@@ -2,7 +2,7 @@ import { FormEvent, useRef, useState } from "react"
 import {Button, Col, Form, Row, Stack } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 import CreatableReactSelect from "react-select/creatable"
-import { NoteData,Tag,Note } from "./NoteApp"
+import { NoteData,Tag,Note } from "../../App"
 import { v4 as uuidV4} from "uuid"
 
 type NoteFormProps={
@@ -26,7 +26,7 @@ export function NoteForm({onSubmit, onAddTag, availableTags, title="", markdown=
       tags: selectedTags,
     })
 
-    navigate("..")
+    navigate("/notes")
   }
   return (
       <Form onSubmit={handleSubmit}>
@@ -77,7 +77,7 @@ export function NoteForm({onSubmit, onAddTag, availableTags, title="", markdown=
               <Button type="submit" variant = "outline-primary">
                 Save
               </Button>
-              <Link to="..">
+              <Link to="/notes">
                 <Button type="button" variant ="outline-secondary">
                   Cancel
                 </Button>

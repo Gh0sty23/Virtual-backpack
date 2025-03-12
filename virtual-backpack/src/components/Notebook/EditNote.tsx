@@ -1,4 +1,4 @@
-import { NoteData, Tag } from "./NoteApp";
+import { NoteData, Tag } from "../../App";
 import { NoteForm } from "./NoteForm";
 import { useNote } from "./NoteLayout";
 

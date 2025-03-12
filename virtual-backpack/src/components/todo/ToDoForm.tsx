@@ -44,37 +44,38 @@ function ToDoForm({addTodo}) {
   
         <Modal show={show} onHide={handleClose} data-bs-theme="dark" centered>
           <Modal.Header closeButton>
-            <Modal.Title className='text-light'>Add New Task</Modal.Title>
+            <Modal.Title className='text-dark'>Add New Task</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form noValidate validated={validated}>
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label className='text-light'>Name</Form.Label>
+                <Form.Label className='text-dark'>Name</Form.Label>
                 <Form.Control
                   required
                   type="text"
                   placeholder="New Task"
                   autoFocus
-                  className= 'to-do-input'
+                  className= 'to-do-input bg-light text-secondary'
                   value = {name}
                   onChange= {(e) => setName(e.target.value)}
                 />
                 <Form.Control.Feedback type="invalid">Task Name is Required</Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
-                <Form.Label className='text-light'>Priority</Form.Label>
-                <Form.Select required value = {priority} aria-label="Default select example" onChange={(e) => setPriority(e.target.value)}>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
+                <Form.Label className='text-dark'>Priority</Form.Label>
+                <Form.Select className = "bg-light text-secondary" required value = {priority} aria-label="Default select example" onChange={(e) => setPriority(e.target.value)}>
+                  <option className = "text-secondary" value="Low">Low</option>
+                  <option className = "text-secondary" value="Medium">Medium</option>
+                  <option className = "text-secondary" value="High">High</option>
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput3">
-                <Form.Label className='text-light'>Date</Form.Label>
+                <Form.Label className='text-dark'>Date</Form.Label>
                 <Form.Control
                   type="date"
                   autoFocus
                   value = {date}
+                  className = 'bg-light text-secondary'
                   onChange= {(e) => setDate(e.target.value)}
                   required
                 />

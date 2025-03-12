@@ -1,19 +1,135 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import './App.css'
 import Sidebar from './components/Sidebar/Sidebar.tsx'
-import NotesApp from "./components/Notebook/NoteApp.tsx"
 import ToDoApp from "./components/todo/ToDoComponent.tsx"
-import Calendar from "./components/Calendar/Calendar.tsx"
 import CalendarApp from "./components/Calendar/CalendarApp.tsx"
+import {v4 as uuidV4} from "uuid";
+import CalendarApp from "./components/Calendar/CalendarApp.tsx"
+import { useMemo } from "react"
+import { useLocalStorage } from "./components/Notebook/useLocalStorage.ts"
+import { NoteList } from "./components/Notebook/NoteList.tsx"
+import EditNote from "./components/Notebook/EditNote.tsx"
+import NewNote from "./components/Notebook/NewNote.tsx"
+import { Note } from "./components/Notebook/Note.tsx"
+import { NoteLayout } from "./components/Notebook/NoteLayout.tsx"
+
+export type Note = {
+  id: string
+}& NoteData
+
+export type RawNote ={
+  id: string
+}& RawNoteData
+
+export type RawNoteData = {
+  title: string 
+  markdown: string
+  tagIds: string[]
+}
+
+export type NoteData = {
+  title: string 
+  markdown: string
+  tags: Tag[]
+}
+export type Tag = {
+  id: string 
+  label: string
+}
+
+>>>>>>> MODULE-LINKING
 
 function App() {
+
+  const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
+    const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
+
+    const notesWithTags = useMemo(() => {
+        return notes.map(note =>{
+            return {...note,tags: tags.filter(tag => note.tagIds.includes(tag.id))}
+        })
+    }, [notes,tags])
+
+    function onCreateNote({tags, ...data}: NoteData){
+        setNotes(prevNotes => {
+            return [...prevNotes,{...data, id:uuidV4(), tagIds: tags.map(tag => tag .id)},
+            ]
+        })
+    }
+
+    function addTag(tag: Tag){
+        setTags(prev => [...prev, tag])
+    }
+
+    function onDeleteNote(id: string){
+        setNotes(prevNotes => {
+            return prevNotes.filter(note=> note.id !==id)
+        })
+    }
+
+    function onUpdateNote(id: string, {tags, ...data}: NoteData){
+        
+        setNotes(prevNotes => {
+            return prevNotes.map(note => {
+                if (note.id === id){
+                        return{...note,...data,tagIds: tags.map(tag => tag .id)}
+                }
+                else{
+                    return note
+                }
+            })
+        })
+    }
+
+    function updateTag(id:string,label:string){
+            
+        setTags(prevTags => {
+            return prevTags.map(tag => {
+                if (tag.id === id){
+                    return {...tag,label}
+                }
+                else{
+                    return tag
+                }
+            })
+        })
+    }
+
+    function deleteTag(id:string){
+        
+        setTags(prevTags => {
+            return prevTags.filter(tag=> tag.id !==id)
+        })
+    }
   return (
     <BrowserRouter>
       <div className="app-container">
         <Sidebar />
         <div className="main-content">
           <Routes>
-            <Route path="/notebook" element={<NotesApp />} />
+            <Route 
+                path="/notes" 
+                element={
+                    <NoteList 
+                        notes ={notesWithTags} 
+                        availableTags={tags} 
+                        onDeleteTag={deleteTag}
+                        onUpdateTag={updateTag} />
+                    }
+               />
+               <Route path="/new" element={<NewNote 
+                    onSubmit={onCreateNote} 
+                    onAddTag={addTag}  
+                    availableTags={tags}/>} />
+                <Route path ="/:id" element ={<NoteLayout 
+                notes={notesWithTags}/>}>
+                    <Route index element ={<Note onDelete= {onDeleteNote}/>}/>
+                    <Route path ="edit" element ={<EditNote 
+                        onSubmit={onUpdateNote} 
+                        onAddTag={addTag}
+                        availableTags={tags}/>}/>
+                </Route>
+                <Route path="*" element={<Navigate to="/" />} />
             <Route path="/flashcards" element={<div>Flashcards Content</div>} />
             <Route path="/calendar" element={<CalendarApp />} />
             <Route path="/todo" element={<ToDoApp />} />
