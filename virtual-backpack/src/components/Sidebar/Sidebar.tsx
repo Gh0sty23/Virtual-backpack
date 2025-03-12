@@ -1,13 +1,15 @@
 import './Sidebar.css'
-function Sidebar () {
+import { Link } from 'react-router-dom'
+
+function Sidebar() {
   return (
     <>
-      <div class="sidenav">
-        <a href ="#">Notebook</a>
-        <a href = "#">Flashcards</a>
-        <a href = "#">Calendar</a>
-        <a href = "#">To-Do list</a>
-        <a href = "#">ID</a>
+      <div className="sidenav">
+        <Link to="/notebook">Notebook</Link>
+        <Link to="/flashcards">Flashcards</Link>
+        <Link to="/calendar">Calendar</Link>
+        <Link to="/todo">To-Do list</Link>
+        <Link to="/id">ID</Link>
       </div>
     </>
   );
