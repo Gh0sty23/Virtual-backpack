@@ -12,6 +12,7 @@ import EditNote from "./components/Notebook/EditNote.tsx"
 import NewNote from "./components/Notebook/NewNote.tsx"
 import { Note } from "./components/Notebook/Note.tsx"
 import { NoteLayout } from "./components/Notebook/NoteLayout.tsx"
+import ID from "./components/ID/ID.tsx"
 
 export type Note = {
   id: string
@@ -42,6 +43,7 @@ function App() {
 
   const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
     const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
+    const idComponent = useMemo(() => <ID />, []);
 
     const notesWithTags = useMemo(() => {
         return notes.map(note =>{
@@ -134,7 +136,7 @@ function App() {
             <Route path="/flashcards" element={<div>Flashcards Content</div>} />
             <Route path="/calendar" element={<CalendarApp />} />
             <Route path="/todo" element={<ToDoApp />} />
-            <Route path="/id" element={<div>ID Content</div>} />
+            <Route path="/id" element={idComponent} />
             <Route path="/" element={<CalendarApp />} />
           </Routes>
         </div>
