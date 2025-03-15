@@ -44,6 +44,7 @@ export function NoteList({availableTags, notes, onUpdateTag, onDeleteTag}:NoteLi
     })
   }, [title, selectedTags, notes])
     return<>
+    <Sidebar /> {/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
         <Row className="align-items-center mb-4">
             <Col><h1>Notes</h1></Col>
             <Col xs="auto">

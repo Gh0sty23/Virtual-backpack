@@ -100,11 +100,10 @@ function App() {
         setTags(prevTags => {
             return prevTags.filter(tag=> tag.id !==id)
         })
-    }
+    } //terrible code. I am so sorry to whoever wants to modifty and or read this stuff. One of the members (Gh0sty23) did not know how to code in react
   return (
     <BrowserRouter>
       <div className="app-container">
-      <Sidebar />
         <div className="main-content">
           <Routes>
             <Route 

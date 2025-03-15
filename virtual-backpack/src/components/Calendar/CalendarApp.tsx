@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Calendar, { CalendarEvent } from './Calendar';
 import './style.css';
+import Sidebar from '../Sidebar/Sidebar';
 
 const CalendarApp: React.FC = () => {
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
@@ -19,6 +20,8 @@ const CalendarApp: React.FC = () => {
   };
 
   return (
+    <>
+    <Sidebar />{/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
     <div className="calendar-wrapper">
       <Calendar
         events={calendarEvents}
@@ -26,6 +29,7 @@ const CalendarApp: React.FC = () => {
         onDeleteEvent={handleDeleteEvent}
       />
     </div>
+    </>
   );
 };
 

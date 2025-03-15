@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import './ID.css';
+import Sidebar from '../Sidebar/Sidebar';
 
 interface IDProps {
   // Add any props your component might need
@@ -45,6 +46,8 @@ const ID: React.FC<IDProps> = () => {
   };
 
   return (
+    <>
+    <Sidebar /> {/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
     <div className="id-container">
       <h2>VIRTUAL ID</h2>
       
@@ -79,6 +82,7 @@ const ID: React.FC<IDProps> = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

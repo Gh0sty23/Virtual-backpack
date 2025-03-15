@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Flashcard.css";
+import Sidebar from "../Sidebar/Sidebar";
 
 interface Flashcard {
   id: number;
@@ -81,6 +82,8 @@ const Flashcard: React.FC = () => {
   };
 
   return (
+    <>
+    <Sidebar /> {/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
     <div className="flashcard-container">
       <div className="sidebar">
         <h2>FLASHCARDS</h2>
@@ -154,6 +157,7 @@ const Flashcard: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
