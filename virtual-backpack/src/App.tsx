@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate,Link, useLocation } from "react-router-dom"
 import './App.css'
 import Sidebar from './components/Sidebar/Sidebar.tsx'
 import ToDoApp from "./components/todo/ToDoComponent.tsx"
@@ -12,6 +12,8 @@ import NewNote from "./components/Notebook/NewNote.tsx"
 import { Note } from "./components/Notebook/Note.tsx"
 import { NoteLayout } from "./components/Notebook/NoteLayout.tsx"
 import ID from "./components/ID/ID.tsx"
+import Flashcards from "./components/Flashcards/Flashcard.tsx"
+import Homepage from "./components/Homepage/homepage.tsx";
 
 export type Note = {
   id: string
@@ -38,11 +40,10 @@ export type Tag = {
 }
 
 function App() {
-
   const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
-    const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
-    const idComponent = useMemo(() => <ID />, []);
-
+  const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
+  const idComponent = useMemo(() => <ID />, []);
+  
     const notesWithTags = useMemo(() => {
         return notes.map(note =>{
             return {...note,tags: tags.filter(tag => note.tagIds.includes(tag.id))}
@@ -103,7 +104,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-container">
-        <Sidebar />
+      <Sidebar />
         <div className="main-content">
           <Routes>
             <Route 
@@ -129,11 +130,11 @@ function App() {
                         availableTags={tags}/>}/>
                 </Route>
                 <Route path="*" element={<Navigate to="/" />} />
-            <Route path="/flashcards" element={<div>Flashcards Content</div>} />
+            <Route path="/flashcards" element={<Flashcards />} />
             <Route path="/calendar" element={<CalendarApp />} />
             <Route path="/todo" element={<ToDoApp />} />
             <Route path="/id" element={idComponent} />
-            <Route path="/" element={<CalendarApp />} />
+            <Route path="/" element={<Homepage />} />
           </Routes>
         </div>
       </div>

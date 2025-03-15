@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ReactSelect from "react-select"
 import { Tag } from "../../App";
 import styles from "./NotesList.module.css"
+import Sidebar from "../Sidebar/Sidebar";
 
 type SimplifiedNote ={
     tags: Tag[]
@@ -27,6 +28,7 @@ type EditTagsModalProps ={
 }
 
 export function NoteList({availableTags, notes, onUpdateTag, onDeleteTag}:NoteListProps){
+    <Sidebar />
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
   const [title, setTitle] = useState("")
   const [editTagsModalIsOpen, setEditTagsModalIsOpen] = useState(false)
