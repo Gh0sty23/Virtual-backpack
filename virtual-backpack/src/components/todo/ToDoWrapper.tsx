@@ -1,13 +1,10 @@
 import { Card } from "react-bootstrap";
 import ToDo from "./ToDo";
-import EditToDoForm from "./EditToDoForm";
-import { useEffect, useState } from "react";
-import React from "react";
 
-function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}) {
+function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}: any) {
     var newToDo = [];
 
-    function isDueToday(value) {
+    function isDueToday(value: { taskDate: string | number | Date; }) {
         const newTaskDate = new Date(value.taskDate);
         newTaskDate.setHours(0,0,0,0);
         // console.log(newTaskDate);
@@ -18,7 +15,7 @@ function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}) {
         }
     }
 
-    function isUpcoming(value) {
+    function isUpcoming(value: { taskDate: string | number | Date; completed: boolean; }) {
         const newTaskDate = new Date(value.taskDate);
         newTaskDate.setHours(0,0,0,0);
         if ((newTaskDate > new Date(new Date().toDateString())) && (value.completed === false)) {
@@ -27,7 +24,7 @@ function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}) {
         }
     }
 
-    function isMissed(value) {
+    function isMissed(value: { taskDate: string | number | Date; completed: boolean; }) {
         const newTaskDate = new Date(value.taskDate);
         newTaskDate.setHours(0,0,0,0);
         if ((newTaskDate < new Date(new Date().toDateString())) && (value.completed === false)) {
@@ -44,9 +41,9 @@ function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}) {
     }
     
 
-    const highPriority = newToDo.filter(value => value.taskPriority.includes("High"));
-    const mediumPriority = newToDo.filter(value => value.taskPriority.includes("Medium"));
-    const lowPriority = newToDo.filter(value => value.taskPriority.includes("Low"));
+    const highPriority = newToDo.filter((value: { taskPriority: string | string[]; }) => value.taskPriority.includes("High"));
+    const mediumPriority = newToDo.filter((value: { taskPriority: string | string[]; }) => value.taskPriority.includes("Medium"));
+    const lowPriority = newToDo.filter((value: { taskPriority: string | string[]; }) => value.taskPriority.includes("Low"));
   
 
     return(
@@ -55,19 +52,19 @@ function ToDoWrapper ({todos, head, toggleComplete, deleteTodo, editTodo}) {
             <Card.Title className="text-dark fs-2 py-2">{head}</Card.Title>
             <Card.Subtitle className="mb-2 text-dark">High Priority</Card.Subtitle>
             <div>
-                {highPriority.map((todo, index) => (
+                {highPriority.map((todo: any, index: any) => (
                     <ToDo task={todo} key={index} toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/>
                 ))}
             </div>
             <Card.Subtitle className="mb-2 text-dark">Medium Priority</Card.Subtitle>
             <div>
-                {mediumPriority.map((todo, index) => (
+                {mediumPriority.map((todo: any, index: any) => (
                     <ToDo task={todo} key={index} toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/>
                 ))}
             </div>
             <Card.Subtitle className="mb-2 text-dark">Low Priority</Card.Subtitle>
             <div>
-                {lowPriority.map((todo, index) => (
+                {lowPriority.map((todo: any, index: any) => (
                     <ToDo task={todo} key={index} toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/>
                 ))}
             </div>

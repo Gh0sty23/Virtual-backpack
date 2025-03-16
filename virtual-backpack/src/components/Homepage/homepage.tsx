@@ -22,12 +22,11 @@ const Homepage = () => {
       {page === 2 && (
         <div className="page2">
           <h2>Open an App:</h2>
-          <button className="nav-btn" onClick={() => navigate("/notes")}>📒 Open Notebook</button>
-          <button className="nav-btn" onClick={() => navigate("/todo")}>✅ Open To-Do List</button>
-          <button className="nav-btn" onClick={() => navigate("/calendar")}>📒 Open Notebook</button>
-          <button className="nav-btn" onClick={() => navigate("/flashcards")}>✅ Open To-Do List</button>
-          <button className="nav-btn" onClick={() => navigate("/id")}>✅ Open To-Do List</button>
-          <button className="nav-btn" onClick={() => setPage(3)}>📖 Tutorial</button>
+          <button className="nav-btn" onClick={() => navigate("/notes")}>Open Notebook</button>
+          <button className="nav-btn" onClick={() => navigate("/todo")}> Open To-Do List</button>
+          <button className="nav-btn" onClick={() => navigate("/calendar")}>Open Calendar</button>
+          <button className="nav-btn" onClick={() => navigate("/flashcards")}>Open Flashcards</button>
+          <button className="nav-btn" onClick={() => navigate("/id")}>Open Id</button>
         </div>
       )}
 

@@ -1,10 +1,7 @@
-import { useEffect, useId, useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { useEffect, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import ToDoForm from './ToDoForm'
-import ToDo from './ToDo'
-import { Button, Col, Container, Row, Stack } from 'react-bootstrap'
-import React from 'react'
+import {Stack } from 'react-bootstrap'
 import ToDoWrapper from './ToDoWrapper'
 import Sidebar from '../Sidebar/Sidebar'
 
@@ -27,7 +24,7 @@ function App() {
   // const handleClose = setShow(false);
   
   useEffect(() => {
-      const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+      const savedTodos = JSON.parse(localStorage.getItem('todos')!) || [];
       setTodos(savedTodos);
   }, []);
 
@@ -55,7 +52,7 @@ function App() {
 
   return (
     <>
-    <Sidebar />{/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
+    <Sidebar /> {/*renders the sidebar. I cannot be assed to figure out a modular way to conditionally code this shit*/}
     <div className = "p-3 w-100 h-100 container">
       <Stack className = "p-3 w-100" direction="horizontal" gap={5}>
         <div className='mx-auto'><ToDoWrapper todos={todos} head = "Today" toggleComplete = {toggleComplete} deleteTodo = {deleteTodo} editTodo = {editTodo}/></div>

@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function EditToDoForm({editTask, task, show, handleClose}) {
+function EditToDoForm({editTask,editTodo, task, show, handleClose}:any) {
   //Open Close
   
   //Validation
@@ -13,7 +13,7 @@ function EditToDoForm({editTask, task, show, handleClose}) {
     const [name, setName] = useState("");
     const [priority, setPriority] = useState("");
     const [date, setDate] = useState("");
-    const handleSubmit = (e) => {
+    const handleSubmit = (e:any) => {
       const form = e.currentTarget;
       e.preventDefault();
 

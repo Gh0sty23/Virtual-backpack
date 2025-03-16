@@ -1,7 +1,5 @@
-import { ButtonGroup, FormGroup, ToggleButton } from "react-bootstrap";
-import EditToDoForm from "./EditToDoForm";
 
-function ToDo ({task, toggleComplete, deleteTodo, editTodo}) {
+function ToDo ({task, toggleComplete, deleteTodo, editTodo}:any) {
     return (
         <div className="bg-light p-2 rounded-3 d-flex container" id = "myCheckbox">
             <input type="checkbox" className="mx-2" onChange={() => toggleComplete(task.id)}/>
