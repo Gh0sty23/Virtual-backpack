@@ -44,11 +44,7 @@ function App() {
     setTodos(todos.map(todo => todo.id === id ? {...todo, isEditing: !todo.isEditing} : todo));
   }
 
-  const editTask = (taskName: any, taskPriority: any, taskDate: any, id: any) => {
-    const newTodos = todos.map(todo => todo.id === id ? {...todo, taskName, taskPriority, taskDate, isEditing: !todo.isEditing} : todo);
-    setTodos(newTodos);
-    localStorage.setItem('todos', JSON.stringify(newTodos));
-  }
+ 
 
   return (
     <>
