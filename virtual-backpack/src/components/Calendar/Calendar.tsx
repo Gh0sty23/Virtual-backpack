@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './style.css';
-import { 
-  format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, 
-  eachDayOfInterval, isSameMonth, isSameDay, addMonths, addWeeks 
+import {
+  format, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
+  eachDayOfInterval, isSameMonth, isSameDay, addMonths, addWeeks
 } from 'date-fns';
 
 // Export the interface separately to fix the import issue
@@ -39,23 +39,33 @@ const Calendar: React.FC<CalendarProps> = ({
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  // --- Correction is in this function ---
   const getViewDates = () => {
-    const start = viewType === 'month' 
-      ? startOfMonth(currentDate)
-      : startOfWeek(currentDate);
-    const end = viewType === 'month'
-      ? endOfMonth(currentDate)
-      : endOfWeek(currentDate);
-
+    let start, end;
+    if (viewType === 'month') {
+      // Get the first and last day of the currently selected month
+      const firstDayOfMonth = startOfMonth(currentDate);
+      const lastDayOfMonth = endOfMonth(currentDate);
+      // Get the start of the week (Sunday) containing the first day
+      start = startOfWeek(firstDayOfMonth);
+      // Get the end of the week (Saturday) containing the last day
+      end = endOfWeek(lastDayOfMonth);
+    } else { // 'week' view
+      start = startOfWeek(currentDate);
+      end = endOfWeek(currentDate);
+    }
+    // Generate all days within the calculated range
     return eachDayOfInterval({ start, end });
   };
+  // --- End of correction ---
+
 
   const handleAddEvent = () => {
     if (newEventTitle.trim()) {
       onAddEvent({
         date: newEventDate,
         title: newEventTitle,
-        color: '#2196f3'
+        color: '#2196f3' // Ensure color is provided if not passed
       });
       setIsAddModalOpen(false);
       setNewEventTitle('');
@@ -65,24 +75,24 @@ const Calendar: React.FC<CalendarProps> = ({
   const changeViewPeriod = (direction: 'next' | 'prev') => {
     setCurrentDate(prev => {
       const modifier = direction === 'next' ? 1 : -1;
-      return viewType === 'month' 
+      return viewType === 'month'
         ? addMonths(prev, modifier)
         : addWeeks(prev, modifier);
     });
   };
-  
+
   return (
     <div className="calendar-container">
       <div className="calendar-controls">
         <button onClick={() => changeViewPeriod('prev')}>&lt;</button>
         <h2>
-          {viewType === 'month' 
+          {viewType === 'month'
             ? format(currentDate, 'MMMM yyyy')
             : `${format(startOfWeek(currentDate), 'MMM d')} - 
                ${format(endOfWeek(currentDate), 'MMM d')}`}
         </h2>
         <button onClick={() => changeViewPeriod('next')}>&gt;</button>
-        
+
         <div className="view-toggle">
           <button
             className={viewType === 'month' ? 'active' : ''}
@@ -107,15 +117,17 @@ const Calendar: React.FC<CalendarProps> = ({
         ))}
 
         {getViewDates().map(date => {
-          const dayEvents = events.filter((event: CalendarEvent) => 
-            isSameDay(new Date(event.date), date)
+          // Check if event.date is valid before creating a Date object
+          const dayEvents = events.filter((event: CalendarEvent) =>
+            event.date && isSameDay(new Date(event.date), date)
           );
-            
+
           return (
             <div
               key={date.toISOString()}
+              // Added `isSameMonth` check for correct styling
               className={`calendar-day 
-                ${!isSameMonth(date, currentDate) ? 'other-month' : ''}
+                ${!isSameMonth(date, currentDate) ? 'other-month' : ''} 
                 ${isSameDay(date, new Date()) ? 'today' : ''}
                 ${selectedDate && isSameDay(date, selectedDate) ? 'selected' : ''}`}
               onClick={() => {
@@ -127,12 +139,12 @@ const Calendar: React.FC<CalendarProps> = ({
               <div className="day-number">{format(date, 'd')}</div>
               <div className="day-events">
                 {dayEvents.map((event: CalendarEvent) => (
-                  <div 
+                  <div
                     key={event.id}
                     className="event-badge"
                     style={{ backgroundColor: event.color || '#2196f3' }}
                     onClick={(e) => {
-                      e.stopPropagation();
+                      e.stopPropagation(); // Prevent day click when clicking event
                       setSelectedEvent(event);
                     }}
                   >
@@ -158,7 +170,7 @@ const Calendar: React.FC<CalendarProps> = ({
             />
             <div className="modal-actions">
               <button onClick={() => setIsAddModalOpen(false)}>Cancel</button>
-              <button 
+              <button
                 onClick={handleAddEvent}
                 disabled={!newEventTitle.trim()}
               >
@@ -173,12 +185,13 @@ const Calendar: React.FC<CalendarProps> = ({
         <div className="calendar-modal">
           <div className="modal-content">
             <h3>Event Details</h3>
-            <p>Date: {format(new Date(selectedEvent.date), 'MMM d, yyyy')}</p>
+            {/* Ensure selectedEvent.date is valid */}
+            <p>Date: {selectedEvent.date ? format(new Date(selectedEvent.date), 'MMM d, yyyy') : 'Invalid Date'}</p>
             <p>Title: {selectedEvent.title}</p>
             <div className="modal-actions">
               <button onClick={() => setSelectedEvent(null)}>Close</button>
               {onDeleteEvent && (
-                <button 
+                <button
                   onClick={() => {
                     onDeleteEvent(selectedEvent.id);
                     setSelectedEvent(null);
