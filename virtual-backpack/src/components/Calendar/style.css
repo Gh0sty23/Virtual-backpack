@@ -1,164 +1,329 @@
-.calendar-wrapper, .calendar-container {
-    max-width: 1100px !important;
-    width: 1100px !important;
-    padding: 10px !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-  }
-.calendar-wrapper {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px;
+.calendar-container {
+  font-family: Arial, sans-serif;
+  
+  /* RESPONSIVE SIZING: 3:2 aspect ratio with 10% vertical margins */
+  width: min(90vw, 80vh * 1.5); /* Width is constrained by either 90% of viewport width or calculated from height */
+  aspect-ratio: 3/2; /* Maintains 3:2 ratio */
+  margin: 10vh auto; /* 10% vertical margins, centered horizontally */
+  
+  /* Remove all fixed dimensions */
+  max-height: none;
+  max-width: none;
+  min-width: none;
+  height: auto;
+  
+  /* Rest of styling unchanged */
+  box-sizing: border-box;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  color: #333;
+  
+  /* Ensure internal layout works properly */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Calendar Grid - Now fully responsive with week view optimization */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%; 
+  gap: 1px;
+  background: #eee;
+  border: 1px solid #ddd;
+  flex-grow: 1; /* Takes remaining space after controls */
+  /* ADD: Constrain the grid rows to prevent expansion */
+  grid-template-rows: auto repeat(auto-fit, 1fr);
+}
+
+/* Week view specific styling - make it less tall */
+.calendar-container.week-view .calendar-grid {
+  grid-template-rows: auto 1fr; /* Header row auto, content row flexible */
+  max-height: 60vh; /* Limit week view height to 60% of viewport */
+}
+
+/* FIXED: Week view day cells with responsive but fixed height */
+.calendar-container.week-view .calendar-day {
+  height: clamp(120px, 15vh, 200px); /* Responsive height between 120px-200px */
+  min-height: clamp(120px, 15vh, 200px); /* Prevent shrinking */
+  max-height: clamp(120px, 15vh, 200px); /* Prevent growing */
+}
+
+/* FIXED: Day Cell - Responsive height based on container but CONSTRAINED */
+.calendar-day {
+  background: white;
+  padding: 8px;
+  /* FIXED: Set responsive but fixed height for month view */
+  height: clamp(80px, 12vh, 150px); 
+  min-height: clamp(80px, 12vh, 150px); /* Prevent shrinking */
+  max-height: clamp(80px, 12vh, 150px); /* Prevent growing */
+  border-right: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent overflow */
+}
+
+/* Controls - Responsive sizing */
+.calendar-controls {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 20px; 
+  padding: 0 10px;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.calendar-controls h2 { 
+  margin: 0 15px; 
+  min-width: 120px; /* Reduced from 180px for smaller screens */
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.5rem); /* Responsive font size */
+}
+
+.calendar-controls button {
+  padding: 8px 16px; 
+  border: 1px solid #ddd; 
+  background: #747474;
+  color: white; 
+  cursor: pointer; 
+  border-radius: 4px;
+  font-size: clamp(0.8rem, 1.5vw, 1rem); /* Responsive button text */
+}
+
+/* Day headers - responsive text */
+.calendar-day-header {
+  background: #f8f9fa; 
+  padding: 10px; 
+  text-align: center;
+  font-weight: bold; 
+  border-bottom: 1px solid #ddd;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+}
+
+/* Event badges - responsive sizing */
+.event-badge {
+  color: white;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: clamp(0.6rem, 1vw, 0.75rem); /* Responsive event text */
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin: 0 2px;
+  /* FIXED: Prevent badges from growing */
+  flex-shrink: 0;
+}
+
+/* Enhanced compact event badge styles */
+.event-badge.compact {
+  padding: 2px 4px;
+  margin-bottom: 1px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1.2;
+  min-height: auto;
+  overflow: hidden;
+  text-align: left; /* Override center alignment for better text display */
+}
+
+.event-badge.compact .event-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.event-badge.compact .event-time-range {
+  font-size: 9px;
+  opacity: 0.9;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.event-badge.compact.all-day {
+  font-size: 11px;
+  padding: 3px 5px;
+  text-align: center;
+}
+
+.event-badge.compact.all-day .event-title {
+  font-weight: 600;
+}
+
+/* Hover effects for better interaction */
+.event-badge.compact:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Day number - responsive sizing */
+.day-number { 
+  font-weight: bold; 
+  margin-bottom: 5px;
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  /* FIXED: Prevent day number from growing */
+  flex-shrink: 0;
+}
+
+/* FIXED: Day events container - now properly constrained with responsive scrolling */
+.day-events { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1px; /* Reduced gap for compact styling */
+  flex-grow: 1; /* Takes remaining space after day number */
+  overflow-y: auto; /* Make events scrollable */
+  overflow-x: hidden;
+  /* FIXED: Use remaining space after day number (responsive) */
+  max-height: calc(100% - clamp(20px, 2vh, 30px)); /* Account for day number height responsively */
+  min-height: 0; /* Allow shrinking */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #ccc transparent; /* Firefox */
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 768px) {
+  .calendar-container {
+    width: 95vw; /* Use more width on mobile */
+    margin: 5vh auto; /* Reduce vertical margins on mobile */
+    padding: 15px; /* Reduce padding */
   }
   
-  .calendar-container {
-    font-family: Arial, sans-serif;
-    max-width: 100%;
-    width: 100%;
-    margin: 0 auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    color: #333333; /* Add this line to set a global text color */
+  /* FIXED: Smaller cell heights for mobile */
+  .calendar-day {
+    height: clamp(60px, 10vh, 120px); 
+    min-height: clamp(60px, 10vh, 120px);
+    max-height: clamp(60px, 10vh, 120px);
+  }
+  
+  .calendar-container.week-view .calendar-day {
+    height: clamp(100px, 12vh, 160px);
+    min-height: clamp(100px, 12vh, 160px);
+    max-height: clamp(100px, 12vh, 160px);
   }
   
   .calendar-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 0 10px;
-  }
-  
-  .calendar-controls button {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background: rgb(116, 116, 116);
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .calendar-controls button.active {
-    background: #2196f3;
-    color: white;
-    border-color: #2196f3;
+    flex-wrap: wrap; /* Allow wrapping on very small screens */
+    gap: 10px;
   }
   
   .view-toggle {
-    display: flex;
-    gap: 8px;
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: #eee;
-    border: 1px solid #ddd;
-  }
-  
-  .calendar-day-header {
-    background: #f8f9fa;
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .calendar-day {
-    background: white;
-    padding: 10px;
-    min-height: 100px;
-    border-right: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-  }
-  
-  .other-month {
-    background: #f8f9fa;
-    color: #999;
-  }
-  
-  .today {
-    background: #e8f5e9;
-  }
-  
-  .selected {
-    background: #e3f2fd;
-  }
-  
-  .day-number {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .day-events {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .event-badge {
-    background: #2196f3;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .calendar-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    min-width: 300px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  
-  .modal-content input {
+    order: 3; /* Move view toggle to new line if needed */
     width: 100%;
-    padding: 8px;
-    margin: 10px -10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    justify-content: center;
   }
   
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+  /* Compact event badge responsive adjustments */
+  .event-badge.compact {
+    font-size: 9px;
+    padding: 1px 3px;
   }
   
-  .modal-actions button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: black;
+  .event-badge.compact .event-time-range {
+    font-size: 8px;
+  }
+}
+
+/* Responsive adjustments for very large screens */
+@media (min-width: 1400px) {
+  .calendar-container {
+    width: 80vw; /* Limit maximum width on very large screens */
   }
   
-  .modal-actions button:first-child {
-    background: gray;
+  /* FIXED: Larger cell heights for large screens */
+  .calendar-day {
+    height: clamp(100px, 14vh, 180px); 
+    min-height: clamp(100px, 14vh, 180px);
+    max-height: clamp(100px, 14vh, 180px);
   }
   
-  .modal-actions button:last-child {
-    background: #2196f3;
-    color: white;
+  .calendar-container.week-view .calendar-day {
+    height: clamp(140px, 18vh, 220px);
+    min-height: clamp(140px, 18vh, 220px);
+    max-height: clamp(140px, 18vh, 220px);
   }
+}
+
+/* Webkit scrollbar styling */
+.day-events::-webkit-scrollbar {
+  width: 4px;
+}
+
+.day-events::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.day-events::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 2px;
+}
+
+.day-events::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+/* --- ALL OTHER STYLES (UNCHANGED) --- */
+.notification {
+  position: fixed; top: 20px; right: 20px;
+  padding: 12px 20px; border-radius: 4px; color: white;
+  font-weight: bold; z-index: 1001; animation: slideIn 0.3s ease-out;
+}
+.notification.success { background-color: #4caf50; }
+.notification.error { background-color: #f44336; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.calendar-controls button.active { background: #2196f3; border-color: #2196f3; }
+.view-toggle { display: flex; gap: 8px; margin-left: auto; }
+.calendar-day:hover { background-color: #f5f5f5; }
+.other-month { background: #f8f9fa; color: #999; }
+.other-month:hover { background-color: #f0f0f0; }
+.today { background: #e8f5e9; }
+.selected { background: #e3f2fd; border: 1px solid #2196f3; }
+.event-badge.all-day { font-weight: bold; }
+.event-time { font-size: 10px; opacity: 0.9; }
+.calendar-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); display: flex; justify-content: center;
+  align-items: center; z-index: 1000;
+}
+.modal-content {
+  background: white; padding: 20px 30px; border-radius: 8px;
+  min-width: 400px; max-width: 500px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.modal-content h3 {
+  margin-top: 0; color: #333; border-bottom: 1px solid #eee;
+  padding-bottom: 10px; margin-bottom: 20px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group label {
+  display: block; margin-bottom: 5px; font-weight: bold; color: #333;
+}
+.form-group input {
+  width: 100%; padding: 8px; border: 1px solid #ddd;
+  border-radius: 4px; font-size: 14px; box-sizing: border-box;
+}
+.form-group input[type="checkbox"] { width: auto; margin-right: 8px; }
+.form-group input.error { border-color: #f44336; }
+.time-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.error-message { color: #f44336; font-size: 12px; margin-top: 5px; }
+.modal-actions {
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+}
+.modal-actions button {
+  padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;
+  font-weight: bold;
+}
+.modal-actions button:first-child { background: #e0e0e0; color: #333; }
+.modal-actions .delete-btn { background-color: #f44336; color: white; }
+.modal-actions .save-btn { background-color: #4caf50; color: white; }

@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
-import Calendar, { CalendarEvent } from './Calendar';
-import './style.css';
-import Sidebar from '../Sidebar/Sidebar';
+import { Calendar, CalendarEvent } from './Calendar';
 
 const CalendarApp: React.FC = () => {
+  // Initial events state is now an empty array
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
   const handleAddEvent = (newEvent: Omit<CalendarEvent, 'id'>) => {
     const event: CalendarEvent = {
       ...newEvent,
-      id: Date.now().toString(),
-      color: newEvent.color || '#2196f3'
+      id: Date.now().toString()
     };
     setCalendarEvents(prev => [...prev, event]);
+  };
+
+  const handleEditEvent = (eventId: string, updatedEvent: Omit<CalendarEvent, 'id'>) => {
+    setCalendarEvents(prev => 
+      prev.map(event => 
+        event.id === eventId 
+          ? { ...updatedEvent, id: eventId }
+          : event
+      )
+    );
   };
 
   const handleDeleteEvent = (eventId: string) => {
@@ -20,16 +28,13 @@ const CalendarApp: React.FC = () => {
   };
 
   return (
-    <>
-    <Sidebar />{/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
-    <div className="calendar-wrapper">
-      <Calendar
-        events={calendarEvents}
-        onAddEvent={handleAddEvent}
-        onDeleteEvent={handleDeleteEvent}
-      />
-    </div>
-    </>
+    // The outer div and H1 title have been removed for a cleaner look
+    <Calendar
+      events={calendarEvents}
+      onAddEvent={handleAddEvent}
+      onEditEvent={handleEditEvent}
+      onDeleteEvent={handleDeleteEvent}
+    />
   );
 };
 

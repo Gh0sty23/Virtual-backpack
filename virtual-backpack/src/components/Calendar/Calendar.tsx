@@ -1,75 +1,274 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
-import {
-  format, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
-  eachDayOfInterval, isSameMonth, isSameDay, addMonths, addWeeks
-} from 'date-fns';
+import Sidebar from '../Sidebar/Sidebar';
 
-// Export the interface separately to fix the import issue
+// --- INTERFACES ---
 export interface CalendarEvent {
   id: string;
   date: Date;
   title: string;
+  startTime?: string;
+  endTime?: string;
+  isAllDay: boolean;
   color: string;
 }
 
 interface CalendarProps {
   view?: 'month' | 'week';
-  events: CalendarEvent[];
-  onAddEvent: (event: Omit<CalendarEvent, 'id'>) => void;
+  events?: CalendarEvent[];
+  onAddEvent?: (event: Omit<CalendarEvent, 'id'>) => void;
+  onEditEvent?: (eventId: string, event: Omit<CalendarEvent, 'id'>) => void;
   onDeleteEvent?: (eventId: string) => void;
   selectedDate?: Date;
   onDateChange?: (date: Date) => void;
 }
 
-const Calendar: React.FC<CalendarProps> = ({
+interface ValidationErrors {
+  title?: string;
+  time?: string;
+}
+
+// --- UTILITY FUNCTIONS ---
+const formatDate = (date: Date, format: string): string => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  switch (format) {
+    case 'MMMM yyyy':
+      return `${fullMonths[date.getMonth()]} ${date.getFullYear()}`;
+    case 'MMM d':
+      return `${months[date.getMonth()]} ${date.getDate()}`;
+    case 'MMM d, yyyy':
+      return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    case 'd':
+      return date.getDate().toString();
+    default:
+      return date.toLocaleDateString();
+  }
+};
+
+const isSameDay = (date1: Date, date2: Date): boolean => {
+  return date1.getDate() === date2.getDate() &&
+         date1.getMonth() === date2.getMonth() &&
+         date1.getFullYear() === date2.getFullYear();
+};
+
+const isSameMonth = (date1: Date, date2: Date): boolean => {
+  return date1.getMonth() === date2.getMonth() &&
+         date1.getFullYear() === date2.getFullYear();
+};
+
+const startOfWeek = (date: Date): Date => {
+  const d = new Date(date);
+  d.setDate(d.getDate() - d.getDay());
+  return d;
+};
+
+const endOfWeek = (date: Date): Date => {
+  const d = new Date(date);
+  d.setDate(d.getDate() + (6 - d.getDay()));
+  return d;
+};
+
+const startOfMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+};
+
+const endOfMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+};
+
+const eachDayOfInterval = (start: Date, end: Date): Date[] => {
+  const days: Date[] = [];
+  const current = new Date(start);
+  
+  while (current <= end) {
+    days.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return days;
+};
+
+const addMonths = (date: Date, amount: number): Date => {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + amount);
+  return newDate;
+};
+
+const addWeeks = (date: Date, amount: number): Date => {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + (amount * 7));
+  return newDate;
+};
+
+const parseTime = (timeString: string): Date => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+};
+
+// --- CALENDAR COMPONENT ---
+export const Calendar: React.FC<CalendarProps> = ({
   view = 'month',
   events = [],
   onAddEvent,
+  onEditEvent,
   onDeleteEvent,
   selectedDate,
   onDateChange
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewType, setViewType] = useState<'month' | 'week'>(view);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [newEventDate, setNewEventDate] = useState<Date>(new Date());
-  const [newEventTitle, setNewEventTitle] = useState('');
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+
+  // Form state
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    startTime: '09:00',
+    endTime: '10:00',
+    isAllDay: false,
+    color: '#2196f3'
+  });
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // --- Correction is in this function ---
+  useEffect(() => {
+    const savedEvents = localStorage.getItem('calendar-events');
+    if (savedEvents && events.length === 0) {
+      try {
+        const parsed = JSON.parse(savedEvents);
+        console.log('Would load events:', parsed);
+      } catch (error) {
+        console.error('Error loading events from localStorage:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (events.length > 0) {
+      try {
+        localStorage.setItem('calendar-events', JSON.stringify(events));
+      } catch (error) {
+        console.error('Error saving events to localStorage:', error);
+        showNotification('Failed to save events', 'error');
+      }
+    }
+  }, [events]);
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const getViewDates = () => {
     let start, end;
     if (viewType === 'month') {
-      // Get the first and last day of the currently selected month
       const firstDayOfMonth = startOfMonth(currentDate);
       const lastDayOfMonth = endOfMonth(currentDate);
-      // Get the start of the week (Sunday) containing the first day
       start = startOfWeek(firstDayOfMonth);
-      // Get the end of the week (Saturday) containing the last day
       end = endOfWeek(lastDayOfMonth);
-    } else { // 'week' view
+    } else {
       start = startOfWeek(currentDate);
       end = endOfWeek(currentDate);
     }
-    // Generate all days within the calculated range
-    return eachDayOfInterval({ start, end });
+    return eachDayOfInterval(start, end);
   };
-  // --- End of correction ---
 
-
-  const handleAddEvent = () => {
-    if (newEventTitle.trim()) {
-      onAddEvent({
-        date: newEventDate,
-        title: newEventTitle,
-        color: '#2196f3' // Ensure color is provided if not passed
-      });
-      setIsAddModalOpen(false);
-      setNewEventTitle('');
+  const validateEventForm = (): ValidationErrors => {
+    const errors: ValidationErrors = {};
+    
+    if (!eventForm.title.trim()) {
+      errors.title = 'Event title is required';
     }
+
+    if (!eventForm.isAllDay && eventForm.startTime && eventForm.endTime) {
+      const startTime = parseTime(eventForm.startTime);
+      const endTime = parseTime(eventForm.endTime);
+      
+      if (endTime <= startTime) {
+        errors.time = 'End time must be after start time';
+      }
+    }
+
+    return errors;
+  };
+
+  const resetForm = () => {
+    setEventForm({
+      title: '',
+      startTime: '09:00',
+      endTime: '10:00',
+      isAllDay: false,
+      color: '#2196f3'
+    });
+    setValidationErrors({});
+  };
+
+  const openAddModal = (date: Date) => {
+    setNewEventDate(date);
+    setIsEditing(false);
+    setSelectedEvent(null);
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setIsEditing(true);
+    setEventForm({
+      title: event.title,
+      startTime: event.startTime || '09:00',
+      endTime: event.endTime || '10:00',
+      isAllDay: event.isAllDay,
+      color: event.color
+    });
+    setNewEventDate(new Date(event.date));
+    setIsModalOpen(true);
+  };
+
+  const handleSaveEvent = () => {
+    const errors = validateEventForm();
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
+    const eventData = {
+      date: newEventDate,
+      title: eventForm.title.trim(),
+      startTime: eventForm.isAllDay ? undefined : eventForm.startTime,
+      endTime: eventForm.isAllDay ? undefined : eventForm.endTime,
+      isAllDay: eventForm.isAllDay,
+      color: eventForm.color
+    };
+
+    if (isEditing && selectedEvent) {
+      onEditEvent?.(selectedEvent.id, eventData);
+      showNotification('Event updated successfully', 'success');
+    } else {
+      onAddEvent?.(eventData);
+      showNotification('Event created successfully', 'success');
+    }
+
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    onDeleteEvent?.(eventId);
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+    showNotification('Event deleted successfully', 'success');
   };
 
   const changeViewPeriod = (direction: 'next' | 'prev') => {
@@ -81,132 +280,140 @@ const Calendar: React.FC<CalendarProps> = ({
     });
   };
 
+  const formatEventTime = (event: CalendarEvent) => {
+    if (event.isAllDay) return 'All day';
+    if (event.startTime && event.endTime) {
+      return `${event.startTime} - ${event.endTime}`;
+    }
+    return '';
+  };
+
   return (
-    <div className="calendar-container">
-      <div className="calendar-controls">
-        <button onClick={() => changeViewPeriod('prev')}>&lt;</button>
-        <h2>
-          {viewType === 'month'
-            ? format(currentDate, 'MMMM yyyy')
-            : `${format(startOfWeek(currentDate), 'MMM d')} - 
-               ${format(endOfWeek(currentDate), 'MMM d')}`}
-        </h2>
-        <button onClick={() => changeViewPeriod('next')}>&gt;</button>
+    <>
+      {/* renders the sidebar only for the apps and not the homepage. I cannot be assed to figure out a modular way to conditionally code this shit */}
+      <Sidebar />
 
-        <div className="view-toggle">
-          <button
-            className={viewType === 'month' ? 'active' : ''}
-            onClick={() => setViewType('month')}
-          >
-            Month
-          </button>
-          <button
-            className={viewType === 'week' ? 'active' : ''}
-            onClick={() => setViewType('week')}
-          >
-            Week
-          </button>
-        </div>
-      </div>
-
-      <div className="calendar-grid">
-        {daysOfWeek.map(day => (
-          <div key={day} className="calendar-day-header">
-            {day}
+      <div className={`calendar-container ${viewType === 'week' ? 'week-view' : 'month-view'}`}>
+        {/* Notification */}
+        {notification && (
+          <div className={`notification ${notification.type}`}>
+            {notification.message}
           </div>
-        ))}
+        )}
 
-        {getViewDates().map(date => {
-          // Check if event.date is valid before creating a Date object
-          const dayEvents = events.filter((event: CalendarEvent) =>
-            event.date && isSameDay(new Date(event.date), date)
-          );
-
-          return (
-            <div
-              key={date.toISOString()}
-              // Added `isSameMonth` check for correct styling
-              className={`calendar-day 
-                ${!isSameMonth(date, currentDate) ? 'other-month' : ''} 
-                ${isSameDay(date, new Date()) ? 'today' : ''}
-                ${selectedDate && isSameDay(date, selectedDate) ? 'selected' : ''}`}
-              onClick={() => {
-                setNewEventDate(date);
-                setIsAddModalOpen(true);
-                onDateChange?.(date);
-              }}
+        {/* Controls */}
+        <div className="calendar-controls">
+          <button onClick={() => changeViewPeriod('prev')}>&lt;</button>
+          <h2>
+            {viewType === 'month'
+              ? formatDate(currentDate, 'MMMM yyyy')
+              : `${formatDate(startOfWeek(currentDate), 'MMM d')} - ${formatDate(endOfWeek(currentDate), 'MMM d')}`}
+          </h2>
+          <button onClick={() => changeViewPeriod('next')}>&gt;</button>
+          <div className="view-toggle">
+            <button
+              className={viewType === 'month' ? 'active' : ''}
+              onClick={() => setViewType('month')}
             >
-              <div className="day-number">{format(date, 'd')}</div>
-              <div className="day-events">
-                {dayEvents.map((event: CalendarEvent) => (
-                  <div
-                    key={event.id}
-                    className="event-badge"
-                    style={{ backgroundColor: event.color || '#2196f3' }}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent day click when clicking event
-                      setSelectedEvent(event);
-                    }}
-                  >
-                    {event.title}
+              Month
+            </button>
+            <button
+              className={viewType === 'week' ? 'active' : ''}
+              onClick={() => setViewType('week')}
+            >
+              Week
+            </button>
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="calendar-grid">
+          {daysOfWeek.map(day => (
+            <div key={day} className="calendar-day-header">{day}</div>
+          ))}
+          {getViewDates().map(date => {
+            const dayEvents = events.filter((event: CalendarEvent) =>
+              event.date && isSameDay(new Date(event.date), date)
+            );
+            return (
+              <div
+                key={date.toISOString()}
+                className={`calendar-day 
+                  ${!isSameMonth(date, currentDate) ? 'other-month' : ''} 
+                  ${isSameDay(date, new Date()) ? 'today' : ''}
+                  ${selectedDate && isSameDay(date, selectedDate) ? 'selected' : ''}`}
+                onClick={() => {
+                  openAddModal(date);
+                  onDateChange?.(date);
+                }}
+              >
+                <div className="day-number">{formatDate(date, 'd')}</div>
+                <div className="day-events">
+                  {dayEvents.map((event: CalendarEvent) => (
+                    <div
+                      key={event.id}
+                      className={`event-badge compact ${event.isAllDay ? 'all-day' : ''}`}
+                      style={{ backgroundColor: event.color || '#2196f3' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(event);
+                      }}
+                      title={`${event.title} ${formatEventTime(event)}`}
+                    >
+                      <div className="event-title">{event.title}</div>
+                      {!event.isAllDay && event.startTime && event.endTime && (
+                        <div className="event-time-range">{event.startTime} - {event.endTime}</div>
+                      )}
+                      {!event.isAllDay && event.startTime && !event.endTime && (
+                        <div className="event-time-range">{event.startTime}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="calendar-modal">
+            <div className="modal-content">
+              <h3>{isEditing ? 'Edit Event' : 'Add Event'} - {formatDate(newEventDate, 'MMM d, yyyy')}</h3>
+              <div className="form-group">
+                <label htmlFor="event-title">Event Title *</label>
+                <input id="event-title" type="text" placeholder="Enter event title" value={eventForm.title} onChange={(e) => setEventForm(prev => ({ ...prev, title: e.target.value }))} className={validationErrors.title ? 'error' : ''}/>
+                {validationErrors.title && <div className="error-message">{validationErrors.title}</div>}
+              </div>
+              <div className="form-group">
+                <label><input type="checkbox" checked={eventForm.isAllDay} onChange={(e) => setEventForm(prev => ({ ...prev, isAllDay: e.target.checked }))}/> All Day Event</label>
+              </div>
+              {!eventForm.isAllDay && (
+                <div className="time-inputs">
+                  <div className="form-group">
+                    <label htmlFor="start-time">Start Time</label>
+                    <input id="start-time" type="time" value={eventForm.startTime} onChange={(e) => setEventForm(prev => ({ ...prev, startTime: e.target.value }))} className={validationErrors.time ? 'error' : ''}/>
                   </div>
-                ))}
+                  <div className="form-group">
+                    <label htmlFor="end-time">End Time</label>
+                    <input id="end-time" type="time" value={eventForm.endTime} onChange={(e) => setEventForm(prev => ({ ...prev, endTime: e.target.value }))} className={validationErrors.time ? 'error' : ''}/>
+                  </div>
+                  {validationErrors.time && <div className="error-message">{validationErrors.time}</div>}
+                </div>
+              )}
+              <div className="form-group">
+                <label htmlFor="event-color">Color</label>
+                <input id="event-color" type="color" value={eventForm.color} onChange={(e) => setEventForm(prev => ({ ...prev, color: e.target.value }))}/>
+              </div>
+              <div className="modal-actions">
+                <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+                {isEditing && (<button onClick={() => selectedEvent && handleDeleteEvent(selectedEvent.id)} className="delete-btn">Delete</button>)}
+                <button onClick={handleSaveEvent} className="save-btn">{isEditing ? 'Update' : 'Add'} Event</button>
               </div>
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
-
-      {isAddModalOpen && (
-        <div className="calendar-modal">
-          <div className="modal-content">
-            <h3>Add Event - {format(newEventDate, 'MMM d, yyyy')}</h3>
-            <input
-              type="text"
-              placeholder="Event title"
-              value={newEventTitle}
-              onChange={(e) => setNewEventTitle(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddEvent()}
-            />
-            <div className="modal-actions">
-              <button onClick={() => setIsAddModalOpen(false)}>Cancel</button>
-              <button
-                onClick={handleAddEvent}
-                disabled={!newEventTitle.trim()}
-              >
-                Add Event
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedEvent && (
-        <div className="calendar-modal">
-          <div className="modal-content">
-            <h3>Event Details</h3>
-            {/* Ensure selectedEvent.date is valid */}
-            <p>Date: {selectedEvent.date ? format(new Date(selectedEvent.date), 'MMM d, yyyy') : 'Invalid Date'}</p>
-            <p>Title: {selectedEvent.title}</p>
-            <div className="modal-actions">
-              <button onClick={() => setSelectedEvent(null)}>Close</button>
-              {onDeleteEvent && (
-                <button
-                  onClick={() => {
-                    onDeleteEvent(selectedEvent.id);
-                    setSelectedEvent(null);
-                  }}
-                  style={{ backgroundColor: '#f44336', color: 'white' }}
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
-
-export default Calendar;
