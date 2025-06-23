@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import './ID.css';
 import Sidebar from '../Sidebar/Sidebar';
+import bcrypt from 'bcryptjs'
+
+
+function salt() {
+  let rand = Math.floor(Math.random() * 3);
+  return bcrypt.genSaltSync(rand + 10)
+}
 
 interface IDData {
   studentNumber: string;
@@ -146,15 +153,15 @@ const ID: React.FC = () => {
   // Form submission
   const handleSubmit = () => {
     if (validateForm()) {
+      const hash = bcrypt.hashSync(formData.password, salt())
       const dataToSave: IDData = {
         studentNumber: formData.studentNumber,
         email: formData.email,
         name: formData.name,
         courseYear: formData.courseYear,
         idPicture: formData.idPicture,
-        password: formData.password // In production, this should be hashed
+        password: hash, // In production, this should be hashed
       };
-      
       setIdData(dataToSave);
       localStorage.setItem('VIRTUAL_ID_DATA', JSON.stringify(dataToSave));
       setCurrentView('display');
@@ -164,13 +171,23 @@ const ID: React.FC = () => {
 
   // Password verification
   const handlePasswordSubmit = () => {
-    if (passwordInput === idData.password) {
-      setCurrentView('display');
-      setPasswordInput('');
-    } else {
-      alert('Incorrect password. Please try again.');
-      setPasswordInput('');
-    }
+    bcrypt.compare(passwordInput, idData.password, (err, result) => {
+        if (err) {
+            // Handle error
+            console.error('Error comparing passwords:', err);
+            return;
+        }
+
+        if (result) {
+            setCurrentView('display');
+            setPasswordInput('');
+            console.log('Passwords match! User authenticated.');
+        } else {
+          alert('Incorrect password. Please try again.');
+          setPasswordInput('');
+          console.log('Passwords do not match! Authentication failed.');
+        }
+    });
   };
 
   // Edit mode handlers
