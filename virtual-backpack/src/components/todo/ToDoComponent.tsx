@@ -482,7 +482,7 @@ function TodoApp() {
       <div className="todo-app">
         <div className="container">
           <div className="header">
-            <h1>Task Manager</h1>
+            <h1>TO-DO LIST</h1>
             {/* Display global error messages */}
             <ErrorMessage message={error} />
           </div>
