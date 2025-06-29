@@ -20,18 +20,28 @@ export type Note = {
 
 export type RawNote ={
   id: string
+  dateCreated: string
+  timeCreated: string
+  dateLastUpdated: string
+  timeLastCreated: string
 }& RawNoteData
 
 export type RawNoteData = {
   title: string 
   markdown: string
   tagIds: string[]
+  dateCreated: string
+  timeCreated: string
+  dateLastUpdated: string
+  timeLastUpdate: string
 }
 
 export type NoteData = {
   title: string 
   markdown: string
   tags: Tag[]
+  dateCreated: string 
+  timeCreated: string 
 }
 export type Tag = {
   id: string 
@@ -50,8 +60,11 @@ function App() {
     }, [notes,tags])
 
     function onCreateNote({tags, ...data}: NoteData){
+      const now = new Date();
+      const dateCreated = now.toISOString().split("T")[0];
+      const timeCreated = now.toTimeString().split(" ")[0];
         setNotes(prevNotes => {
-            return [...prevNotes,{...data, id:uuidV4(), tagIds: tags.map(tag => tag .id)},
+            return [...prevNotes,{...data, id:uuidV4(), tagIds: tags.map(tag => tag .id), dateCreated, timeCreated,},
             ]
         })
     }
@@ -67,11 +80,13 @@ function App() {
     }
 
     function onUpdateNote(id: string, {tags, ...data}: NoteData){
-        
+      const now = new Date();
+      const dateLastUpdated = now.toISOString().split("T")[0];
+      const timeLastUpdated = now.toTimeString().split(" ")[0];
         setNotes(prevNotes => {
             return prevNotes.map(note => {
                 if (note.id === id){
-                        return{...note,...data,tagIds: tags.map(tag => tag .id)}
+                        return{...note,...data,tagIds: tags.map(tag => tag .id), dateLastUpdated, timeLastUpdated}
                 }
                 else{
                     return note
