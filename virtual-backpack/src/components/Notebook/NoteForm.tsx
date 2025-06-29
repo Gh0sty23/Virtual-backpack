@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import CreatableReactSelect from "react-select/creatable"
 import { NoteData,Tag } from "../../App"
 import { v4 as uuidV4} from "uuid"
+import validator from "validator";
 
 type NoteFormProps={
   onSubmit: (data: NoteData) => void
@@ -20,13 +21,19 @@ export function NoteForm({onSubmit, onAddTag, availableTags, title="", markdown=
   
   function handleSubmit(e: FormEvent){
     e.preventDefault()
-    onSubmit({
-      title: titleRef.current!.value,
-      markdown: markdownRef.current!.value,
-      tags: selectedTags,
-    })
+    const cleanedTitle = titleRef.current!.value.trim();
+    const cleanedMarkdown = markdownRef.current!.value.trim();
+    if (cleanedTitle === '' || cleanedMarkdown === '') {
+      alert('Input cannot be empty!!');
+    } else {
+      onSubmit({
+        title: cleanedTitle,
+        markdown: cleanedMarkdown,
+        tags: selectedTags,
+      })
+      navigate("/notes");
+    }
 
-    navigate("/notes")
   }
   return (
       <Form onSubmit={handleSubmit}>
@@ -46,6 +53,11 @@ export function NoteForm({onSubmit, onAddTag, availableTags, title="", markdown=
                     <Form.Label>Tags</Form.Label>
                     <CreatableReactSelect 
                       onCreateOption={label => {
+                        const trimmedLabel = label.trim();
+                        if (trimmedLabel === "") {
+                          alert("Cannot create empty tag");
+                          return;
+                        }
                         const newTag = {id:uuidV4(), label}
                         onAddTag(newTag)
                         setSelectedTags(prev => [...prev, newTag])
