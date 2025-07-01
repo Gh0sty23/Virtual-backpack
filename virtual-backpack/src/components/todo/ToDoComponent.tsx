@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import ToDoForm from './ToDoForm'
-import {Stack } from 'react-bootstrap'
+import { Stack } from 'react-bootstrap'
 import ToDoWrapper from './ToDoWrapper'
 import Sidebar from '../Sidebar/Sidebar'
 import EditToDoForm from './EditToDoForm';
@@ -29,8 +29,16 @@ function App() {
   };
 
   useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem('todos')!) || [];
-    setTodos(savedTodos);
+    const todosFromStorage = localStorage.getItem('todos');
+    if (todosFromStorage) {
+      try {
+        const parsedTodos = JSON.parse(todosFromStorage);
+        setTodos(parsedTodos);
+      } catch (e) {
+        console.error('Error parsing todos from localStorage', e);
+        setTodos([]);
+      }
+    }
   }, []);
 
   const toggleComplete = (id: any) => {

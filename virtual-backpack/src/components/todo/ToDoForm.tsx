@@ -35,6 +35,11 @@ function ToDoForm({ addTodo }: ToDoFormProps) {
     const form = e.currentTarget;
     const today = new Date();
     const selectedDate = new Date(date);
+    const cleanedName = name.trim();
+    if (cleanedName === "") {
+      alert!("Name cannot be empty!");
+      return;
+    }
     setDateError(""); // Reset date error on submit
     if (form.checkValidity() === true && selectedDate >= today) {
       // Form is valid: add task, reset fields, close modal
@@ -43,9 +48,9 @@ function ToDoForm({ addTodo }: ToDoFormProps) {
       setPriority("Low");
       setDate("");
       setShow(false);
-    }else{
-      if (selectedDate < today){
-        setDateError("Due date cannot be in the past"); 
+    } else {
+      if (selectedDate < today) {
+        setDateError("Due date cannot be in the past");
       }
     }
 
