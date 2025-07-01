@@ -37,10 +37,10 @@ interface ValidationErrors {
 // --- UTILITY FUNCTIONS ---
 const formatDate = (date: Date, format: string): string => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June',
-                      'July', 'August', 'September', 'October', 'November', 'December'];
-  
+    'July', 'August', 'September', 'October', 'November', 'December'];
+
   switch (format) {
     case 'MMMM yyyy':
       return `${fullMonths[date.getMonth()]} ${date.getFullYear()}`;
@@ -57,13 +57,13 @@ const formatDate = (date: Date, format: string): string => {
 
 const isSameDay = (date1: Date, date2: Date): boolean => {
   return date1.getDate() === date2.getDate() &&
-         date1.getMonth() === date2.getMonth() &&
-         date1.getFullYear() === date2.getFullYear();
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear();
 };
 
 const isSameMonth = (date1: Date, date2: Date): boolean => {
   return date1.getMonth() === date2.getMonth() &&
-         date1.getFullYear() === date2.getFullYear();
+    date1.getFullYear() === date2.getFullYear();
 };
 
 const isDateBeforeToday = (date: Date): boolean => {
@@ -97,12 +97,12 @@ const endOfMonth = (date: Date): Date => {
 const eachDayOfInterval = (start: Date, end: Date): Date[] => {
   const days: Date[] = [];
   const current = new Date(start);
-  
+
   while (current <= end) {
     days.push(new Date(current));
     current.setDate(current.getDate() + 1);
   }
-  
+
   return days;
 };
 
@@ -136,7 +136,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   onDateChange,
   onEventsLoad,
   eventToEdit,
-  onEventSelect,
+  //onEventSelect,
   onModalClose,
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -146,7 +146,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [newEventDate, setNewEventDate] = useState<Date>(new Date());
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   // Form state
   const [eventForm, setEventForm] = useState({
@@ -163,7 +163,7 @@ export const Calendar: React.FC<CalendarProps> = ({
     if (eventToEdit) {
       openEditModal(eventToEdit);
     }
-  }, [eventToEdit]);  
+  }, [eventToEdit]);
   // Load events from localStorage on component mount
   useEffect(() => {
     const savedEvents = localStorage.getItem('calendar-events');
@@ -215,7 +215,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const validateEventForm = (): ValidationErrors => {
     const errors: ValidationErrors = {};
-    
+
     if (!eventForm.title.trim()) {
       errors.title = 'Event title is required';
     }
@@ -227,7 +227,7 @@ export const Calendar: React.FC<CalendarProps> = ({
     if (!eventForm.isAllDay && eventForm.startTime && eventForm.endTime) {
       const startTime = parseTime(eventForm.startTime);
       const endTime = parseTime(eventForm.endTime);
-      
+
       if (endTime <= startTime) {
         errors.time = 'End time must be after start time';
       }
@@ -253,7 +253,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       showNotification('Cannot create events for past dates', 'error');
       return;
     }
-    
+
     setNewEventDate(date);
     setIsEditing(false);
     setSelectedEvent(null);
@@ -383,7 +383,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               event.date && isSameDay(new Date(event.date), date)
             );
             const isPastDate = isDateBeforeToday(date);
-            
+
             return (
               <div
                 key={date.toISOString()}
@@ -432,7 +432,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           <div className="calendar-modal">
             <div className="modal-content">
               <h3>{isEditing ? 'Edit Event' : 'Add Event'} - {formatDate(newEventDate, 'MMM d, yyyy')}</h3>
-              
+
               <div className="form-group">
                 <label htmlFor="event-title">Event Title *</label>
                 <input id="event-title" type="text" placeholder="Enter event title" value={eventForm.title} onChange={e => setEventForm(prev => ({ ...prev, title: e.target.value }))} className={validationErrors.title ? 'error' : ''} />
@@ -444,9 +444,9 @@ export const Calendar: React.FC<CalendarProps> = ({
                 <label htmlFor="event-description">Description</label>
                 <textarea id="event-description" placeholder="Add details about the event..." rows={3} value={eventForm.description} onChange={e => setEventForm(prev => ({ ...prev, description: e.target.value }))} />
               </div>
-              
+
               {validationErrors.date && <div className="error-message date-error">{validationErrors.date}</div>}
-              
+
               {/* THIS WAS MISSING: Inline group for All Day and Color */}
               <div className="modal-inline-group">
                 <div className="form-group">

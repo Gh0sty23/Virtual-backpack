@@ -35,14 +35,14 @@ const courseOptions = [
   { code: 'ABM', name: 'ABM - Accountancy and Business Management Strand' },
   { code: 'HUMSS', name: 'HUMSS - Humanities and Social Sciences Strand' },
   { code: 'GAS', name: 'GAS - General Academic Strand' },
-  
+
   // Architecture, Design, and Planning Programs
   { code: 'AR', name: 'AR - Bachelor of Science in Architecture' },
   { code: 'ID', name: 'ID - Bachelor of Science in Industrial Design' },
   { code: 'INT', name: 'INT - Bachelor of Science in Interior Design' },
   { code: 'EP', name: 'EP - Bachelor of Science in Environmental Planning' },
   { code: 'UP', name: 'UP - Bachelor of Science in Urban Planning' },
-  
+
   // Engineering Programs
   { code: 'BE', name: 'BE - Bachelor of Science in Biological Engineering' },
   { code: 'CE', name: 'CE - Bachelor of Science in Civil Engineering' },
@@ -58,14 +58,14 @@ const courseOptions = [
   { code: 'MGTE', name: 'MGTE - Bachelor of Science in Management Engineering' },
   { code: 'MSE', name: 'MSE - Bachelor of Science in Materials Science and Engineering' },
   { code: 'NRGE', name: 'NRGE - Bachelor of Science in Energy Engineering' },
-  
+
   // Computer Science and Information Technology Programs
   { code: 'CS', name: 'CS - Bachelor of Science in Computer Science' },
   { code: 'DS', name: 'DS - Bachelor of Science in Data Science' },
   { code: 'EMC', name: 'EMC - Bachelor of Science in Entertainment and Multimedia Computing' },
   { code: 'IS', name: 'IS - Bachelor of Science in Information Systems' },
   { code: 'IT', name: 'IT - Bachelor of Science in Information Technology' },
-  
+
   // Business and Management Programs
   { code: 'ACT', name: 'ACT - Bachelor of Science in Accountancy' },
   { code: 'BA', name: 'BA - Bachelor of Science in Business Administration' },
@@ -75,7 +75,7 @@ const courseOptions = [
   { code: 'GLM', name: 'GLM - Bachelor of Science in Global Management' },
   { code: 'MKT', name: 'MKT - Bachelor of Science in Marketing' },
   { code: 'REM', name: 'REM - Bachelor of Science in Real Estate Management' },
-  
+
   // Media, Arts, and Communication Programs
   { code: 'ADA', name: 'ADA - Bachelor of Arts in Advertising Design' },
   { code: 'BMA', name: 'BMA - Bachelor of Arts in Broadcast Media' },
@@ -83,7 +83,7 @@ const courseOptions = [
   { code: 'DF', name: 'DF - Bachelor of Arts in Digital Film' },
   { code: 'DJA', name: 'DJA - Bachelor of Arts in Digital Journalism' },
   { code: 'TCB', name: 'TCB - Bachelor of Science in Technical Communication' },
-  
+
   // Health and Natural Sciences Programs
   { code: 'BIO', name: 'BIO - Bachelor of Science in Biology' },
   { code: 'CHM', name: 'CHM - Bachelor of Science in Chemistry' },
@@ -93,7 +93,7 @@ const courseOptions = [
   { code: 'PHY', name: 'PHY - Bachelor of Science in Physics' },
   { code: 'PSYA', name: 'PSYA - Bachelor of Arts in Psychology' },
   { code: 'PSYB', name: 'PSYB - Bachelor of Science in Psychology' },
-  
+
   // Physical Education
   { code: 'BPE', name: 'BPE - Bachelor in Physical Education Major in Sports and Wellness Management' },
 
@@ -118,7 +118,7 @@ const courseOptions = [
   { code: 'ESETESE', name: 'ESETESE - Bachelor of Engineering Technology in Environmental and Sanitary Engineering Technology - BS in Environmental and Sanitary Engineering' },
   { code: 'IETIE', name: 'IETIE - Bachelor of Engineering Technology in Industrial Engineering Technology - BS in Industrial Engineering' },
   { code: 'METME', name: 'METME - Bachelor of Engineering Technology in Mechanical Engineering Technology - BS in Mechanical Engineering' },
-  
+
   // Fully Online Undergraduate Programs (UOx)
   { code: 'CPE-O', name: 'CPE-O - Bachelor of Science in Computer Engineering Online' },
   { code: 'CS-O', name: 'CS-O - Bachelor of Science in Computer Science Online' },
@@ -292,56 +292,56 @@ const ID: React.FC = () => {
     return emailRegex.test(email);
   };
 
-const validateForm = (): boolean => {
-  const newErrors: ValidationErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
 
-  // Required field validation
-  if (!formData.studentNumber.trim()) {
-    newErrors.studentNumber = 'Student Number is required';
-  }
-
-  if (!formData.email.trim()) {
-    newErrors.email = 'Email Address is required';
-  } else if (!validateEmail(formData.email)) {
-    newErrors.email = 'Please enter a valid email address';
-  }
-
-  if (!formData.name.trim()) {
-    newErrors.name = 'Name is required';
-  }
-
-  // Enhanced course/year validation
-  if (!selectedCourse || !selectedYear) {
-    newErrors.courseYear = 'Both course and year must be selected from the dropdown options';
-  } else {
-    // Validate that selected course exists in options
-    const courseExists = courseOptions.some(course => course.code === selectedCourse);
-    const yearExists = yearOptions.includes(selectedYear);
-    
-    if (!courseExists) {
-      newErrors.courseYear = 'Please select a valid course from the dropdown';
-    } else if (!yearExists) {
-      newErrors.courseYear = 'Please select a valid year from the dropdown';
+    // Required field validation
+    if (!formData.studentNumber.trim()) {
+      newErrors.studentNumber = 'Student Number is required';
     }
-  }
 
-  if (!formData.idPicture) {
-    newErrors.idPicture = 'ID Picture is required';
-  }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email Address is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
 
-  if (!formData.password) {
-    newErrors.password = 'Password is required';
-  } else if (formData.password.length < 6) {
-    newErrors.password = 'Password must be at least 6 characters';
-  }
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
 
-  if (formData.password !== formData.confirmPassword) {
-    newErrors.confirmPassword = 'Passwords do not match';
-  }
+    // Enhanced course/year validation
+    if (!selectedCourse || !selectedYear) {
+      newErrors.courseYear = 'Both course and year must be selected from the dropdown options';
+    } else {
+      // Validate that selected course exists in options
+      const courseExists = courseOptions.some(course => course.code === selectedCourse);
+      const yearExists = yearOptions.includes(selectedYear);
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+      if (!courseExists) {
+        newErrors.courseYear = 'Please select a valid course from the dropdown';
+      } else if (!yearExists) {
+        newErrors.courseYear = 'Please select a valid year from the dropdown';
+      }
+    }
+
+    if (!formData.idPicture) {
+      newErrors.idPicture = 'ID Picture is required';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Filter functions for dropdowns
   const filteredCourses = courseOptions.filter(course =>
@@ -354,17 +354,17 @@ const validateForm = (): boolean => {
   );
 
   // Dropdown handlers
-  const handleCourseSelect = (courseCode: string) => {
-    setSelectedCourse(courseCode);
-    setCourseSearchTerm('');
-    setCourseDropdownOpen(false);
-  };
+  //const handleCourseSelect = (courseCode: string) => {
+  //setSelectedCourse(courseCode);
+  //setCourseSearchTerm('');
+  //setCourseDropdownOpen(false);
+  //};
 
-  const handleYearSelect = (year: string) => {
-    setSelectedYear(year);
-    setYearSearchTerm('');
-    setYearDropdownOpen(false);
-  };
+  //const handleYearSelect = (year: string) => {
+  // setSelectedYear(year);
+  //setYearSearchTerm('');
+  //setYearDropdownOpen(false);
+  //};
 
   // Image upload handling
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -424,21 +424,21 @@ const validateForm = (): boolean => {
   // Password verification
   const handlePasswordSubmit = () => {
     bcrypt.compare(passwordInput, idData.password, (err, result) => {
-        if (err) {
-            // Handle error
-            console.error('Error comparing passwords:', err);
-            return;
-        }
+      if (err) {
+        // Handle error
+        console.error('Error comparing passwords:', err);
+        return;
+      }
 
-        if (result) {
-            setCurrentView('display');
-            setPasswordInput('');
-            console.log('Passwords match! User authenticated.');
-        } else {
-          alert('Incorrect password. Please try again.');
-          setPasswordInput('');
-          console.log('Passwords do not match! Authentication failed.');
-        }
+      if (result) {
+        setCurrentView('display');
+        setPasswordInput('');
+        console.log('Passwords match! User authenticated.');
+      } else {
+        alert('Incorrect password. Please try again.');
+        setPasswordInput('');
+        console.log('Passwords do not match! Authentication failed.');
+      }
     });
   };
 
@@ -453,26 +453,26 @@ const validateForm = (): boolean => {
     setErrors({});
   };
 
-const handleCancelEdit = () => {
-  setIsEditing(false);
-  setCurrentView('display');
-  setFormData({
-    studentNumber: '',
-    email: '',
-    name: '',
-    courseYear: '',
-    idPicture: '',
-    password: '',
-    confirmPassword: ''
-  });
-  setSelectedCourse('');
-  setSelectedYear('');
-  setCourseSearchTerm('');
-  setYearSearchTerm('');
-  setCourseDropdownOpen(false);
-  setYearDropdownOpen(false);
-  setErrors({});
-};
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setCurrentView('display');
+    setFormData({
+      studentNumber: '',
+      email: '',
+      name: '',
+      courseYear: '',
+      idPicture: '',
+      password: '',
+      confirmPassword: ''
+    });
+    setSelectedCourse('');
+    setSelectedYear('');
+    setCourseSearchTerm('');
+    setYearSearchTerm('');
+    setCourseDropdownOpen(false);
+    setYearDropdownOpen(false);
+    setErrors({});
+  };
 
   // Reset/Delete ID
   const handleDeleteID = () => {
@@ -525,7 +525,7 @@ const handleCancelEdit = () => {
             <button onClick={handlePasswordSubmit} className="btn-primary">
               View ID
             </button>
-            <button 
+            <button
               onClick={() => setCurrentView('form')}
               className="btn-secondary"
             >
@@ -541,11 +541,11 @@ const handleCancelEdit = () => {
   const renderForm = () => (
     <div className="id-form">
       <h2>{isEditing ? 'Edit Virtual ID' : 'Create Virtual ID'}</h2>
-      
+
       <div className="virtual-id-form">
         <div className="form-section">
           <h3>Personal Information</h3>
-          
+
           <div className="form-group">
             <label htmlFor="studentNumber">Student Number *</label>
             <input
@@ -600,21 +600,21 @@ const handleCancelEdit = () => {
                     setErrors(prev => ({ ...prev, courseYear: undefined }));
                   }}
                   onClick={() => setCourseDropdownOpen(true)}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     // Delay closing to allow for selection
                     setTimeout(() => {
                       setCourseDropdownOpen(false);
                       // If no valid course is selected, clear the search term
                       if (!selectedCourse && courseSearchTerm) {
-                        const exactMatch = courseOptions.find(course => 
+                        const exactMatch = courseOptions.find(course =>
                           course.code.toLowerCase() === courseSearchTerm.toLowerCase() ||
                           course.name.toLowerCase() === courseSearchTerm.toLowerCase()
                         );
                         if (!exactMatch) {
                           setCourseSearchTerm('');
-                          setErrors(prev => ({ 
-                            ...prev, 
-                            courseYear: 'Please select a valid course from the dropdown' 
+                          setErrors(prev => ({
+                            ...prev,
+                            courseYear: 'Please select a valid course from the dropdown'
                           }));
                         }
                       }
@@ -638,16 +638,16 @@ const handleCancelEdit = () => {
                   </button>
                 )}
                 {courseDropdownOpen && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '100%', 
-                    left: 0, 
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
                     right: '-100%',
-                    backgroundColor: 'white', 
-                    border: '1px solid #ddd', 
-                    borderRadius: '4px', 
-                    maxHeight: '200px', 
-                    overflowY: 'auto', 
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
                     zIndex: 1001,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     minWidth: '300px'
@@ -696,20 +696,20 @@ const handleCancelEdit = () => {
                     setErrors(prev => ({ ...prev, courseYear: undefined }));
                   }}
                   onClick={() => setYearDropdownOpen(true)}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     // Delay closing to allow for selection
                     setTimeout(() => {
                       setYearDropdownOpen(false);
                       // If no valid year is selected, clear the search term
                       if (!selectedYear && yearSearchTerm) {
-                        const exactMatch = yearOptions.find(year => 
+                        const exactMatch = yearOptions.find(year =>
                           year.toLowerCase() === yearSearchTerm.toLowerCase()
                         );
                         if (!exactMatch) {
                           setYearSearchTerm('');
-                          setErrors(prev => ({ 
-                            ...prev, 
-                            courseYear: 'Please select a valid year from the dropdown' 
+                          setErrors(prev => ({
+                            ...prev,
+                            courseYear: 'Please select a valid year from the dropdown'
                           }));
                         }
                       }
@@ -733,16 +733,16 @@ const handleCancelEdit = () => {
                   </button>
                 )}
                 {yearDropdownOpen && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '100%', 
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
                     left: '0%',
                     right: 0,
-                    backgroundColor: 'white', 
-                    border: '1px solid #ddd', 
-                    borderRadius: '4px', 
-                    maxHeight: '200px', 
-                    overflowY: 'auto', 
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
                     zIndex: 1001,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     maxWidth: '130px'
@@ -784,14 +784,14 @@ const handleCancelEdit = () => {
 
         <div className="form-section">
           <h3>ID Picture</h3>
-          
+
           <div className="form-group">
             <label>Upload ID Picture *</label>
             <div className="image-upload-section">
               {formData.idPicture ? (
                 <div className="image-preview">
                   <img src={formData.idPicture} alt="ID Preview" />
-                  <button 
+                  <button
                     onClick={() => {
                       setFormData(prev => ({ ...prev, idPicture: '' }));
                       if (fileInputRef.current) {
@@ -812,7 +812,7 @@ const handleCancelEdit = () => {
                   </div>
                 </div>
               )}
-              
+
               <input
                 type="file"
                 ref={fileInputRef}
@@ -820,8 +820,8 @@ const handleCancelEdit = () => {
                 accept="image/jpeg,image/jpg,image/png,image/gif"
                 style={{ display: 'none' }}
               />
-              
-              <button 
+
+              <button
                 onClick={() => fileInputRef.current?.click()}
                 className="btn-upload"
               >
@@ -834,7 +834,7 @@ const handleCancelEdit = () => {
 
         <div className="form-section">
           <h3>Security</h3>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password *</label>
             <input
@@ -876,14 +876,14 @@ const handleCancelEdit = () => {
 
       {/* Click outside to close dropdowns */}
       {(courseDropdownOpen || yearDropdownOpen) && (
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            width: '100%', 
-            height: '100%', 
-            zIndex: 999 
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 999
           }}
           onClick={() => {
             setCourseDropdownOpen(false);
@@ -898,17 +898,17 @@ const handleCancelEdit = () => {
   const renderIDDisplay = () => (
     <div className="id-display">
       <h2>Virtual ID</h2>
-      
+
       <div className="virtual-id-card">
         <div className="id-header">
           <h3>STUDENT IDENTIFICATION</h3>
         </div>
-        
+
         <div className="id-body">
           <div className="id-photo">
             <img src={idData.idPicture} alt="Student ID" />
           </div>
-          
+
           <div className="id-info">
             <div className="info-row">
               <span className="label">Student Number:</span>
