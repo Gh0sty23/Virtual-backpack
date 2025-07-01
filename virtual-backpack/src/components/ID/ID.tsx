@@ -292,45 +292,56 @@ const ID: React.FC = () => {
     return emailRegex.test(email);
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: ValidationErrors = {};
+const validateForm = (): boolean => {
+  const newErrors: ValidationErrors = {};
 
-    // Required field validation
-    if (!formData.studentNumber.trim()) {
-      newErrors.studentNumber = 'Student Number is required';
+  // Required field validation
+  if (!formData.studentNumber.trim()) {
+    newErrors.studentNumber = 'Student Number is required';
+  }
+
+  if (!formData.email.trim()) {
+    newErrors.email = 'Email Address is required';
+  } else if (!validateEmail(formData.email)) {
+    newErrors.email = 'Please enter a valid email address';
+  }
+
+  if (!formData.name.trim()) {
+    newErrors.name = 'Name is required';
+  }
+
+  // Enhanced course/year validation
+  if (!selectedCourse || !selectedYear) {
+    newErrors.courseYear = 'Both course and year must be selected from the dropdown options';
+  } else {
+    // Validate that selected course exists in options
+    const courseExists = courseOptions.some(course => course.code === selectedCourse);
+    const yearExists = yearOptions.includes(selectedYear);
+    
+    if (!courseExists) {
+      newErrors.courseYear = 'Please select a valid course from the dropdown';
+    } else if (!yearExists) {
+      newErrors.courseYear = 'Please select a valid year from the dropdown';
     }
+  }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email Address is required';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
+  if (!formData.idPicture) {
+    newErrors.idPicture = 'ID Picture is required';
+  }
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
+  if (!formData.password) {
+    newErrors.password = 'Password is required';
+  } else if (formData.password.length < 6) {
+    newErrors.password = 'Password must be at least 6 characters';
+  }
 
-    if (!formData.courseYear.trim()) {
-      newErrors.courseYear = 'Course and Year are required';
-    }
+  if (formData.password !== formData.confirmPassword) {
+    newErrors.confirmPassword = 'Passwords do not match';
+  }
 
-    if (!formData.idPicture) {
-      newErrors.idPicture = 'ID Picture is required';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   // Filter functions for dropdowns
   const filteredCourses = courseOptions.filter(course =>
@@ -442,24 +453,26 @@ const ID: React.FC = () => {
     setErrors({});
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setCurrentView('display');
-    setFormData({
-      studentNumber: '',
-      email: '',
-      name: '',
-      courseYear: '',
-      idPicture: '',
-      password: '',
-      confirmPassword: ''
-    });
-    setSelectedCourse('');
-    setSelectedYear('');
-    setCourseSearchTerm('');
-    setYearSearchTerm('');
-    setErrors({});
-  };
+const handleCancelEdit = () => {
+  setIsEditing(false);
+  setCurrentView('display');
+  setFormData({
+    studentNumber: '',
+    email: '',
+    name: '',
+    courseYear: '',
+    idPicture: '',
+    password: '',
+    confirmPassword: ''
+  });
+  setSelectedCourse('');
+  setSelectedYear('');
+  setCourseSearchTerm('');
+  setYearSearchTerm('');
+  setCourseDropdownOpen(false);
+  setYearDropdownOpen(false);
+  setErrors({});
+};
 
   // Reset/Delete ID
   const handleDeleteID = () => {
@@ -578,22 +591,58 @@ const ID: React.FC = () => {
                 <label>Course *</label>
                 <input
                   type="text"
-                  value={selectedCourse || courseSearchTerm}
+                  value={selectedCourse ? courseOptions.find(c => c.code === selectedCourse)?.code || '' : courseSearchTerm}
                   onChange={(e) => {
                     setCourseSearchTerm(e.target.value);
                     setSelectedCourse('');
                     setCourseDropdownOpen(true);
+                    // Clear course-related errors when typing
+                    setErrors(prev => ({ ...prev, courseYear: undefined }));
                   }}
                   onClick={() => setCourseDropdownOpen(true)}
+                  onBlur={(e) => {
+                    // Delay closing to allow for selection
+                    setTimeout(() => {
+                      setCourseDropdownOpen(false);
+                      // If no valid course is selected, clear the search term
+                      if (!selectedCourse && courseSearchTerm) {
+                        const exactMatch = courseOptions.find(course => 
+                          course.code.toLowerCase() === courseSearchTerm.toLowerCase() ||
+                          course.name.toLowerCase() === courseSearchTerm.toLowerCase()
+                        );
+                        if (!exactMatch) {
+                          setCourseSearchTerm('');
+                          setErrors(prev => ({ 
+                            ...prev, 
+                            courseYear: 'Please select a valid course from the dropdown' 
+                          }));
+                        }
+                      }
+                    }, 200);
+                  }}
                   className={`form-input ${errors.courseYear ? 'error' : ''}`}
                   placeholder="Search for course..."
+                  readOnly={selectedCourse !== ''} // Make readonly when course is selected
                 />
+                {selectedCourse && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCourse('');
+                      setCourseSearchTerm('');
+                      setErrors(prev => ({ ...prev, courseYear: undefined }));
+                    }}
+                    className="clear-button" // or "clear-button-minimal" for the minimal version
+                  >
+                    ×
+                  </button>
+                )}
                 {courseDropdownOpen && (
                   <div style={{ 
                     position: 'absolute', 
                     top: '100%', 
                     left: 0, 
-                    right: '100%', 
+                    right: '-100%',
                     backgroundColor: 'white', 
                     border: '1px solid #ddd', 
                     borderRadius: '4px', 
@@ -601,12 +650,18 @@ const ID: React.FC = () => {
                     overflowY: 'auto', 
                     zIndex: 1001,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    minWidth: '500px'
+                    minWidth: '300px'
                   }}>
                     {filteredCourses.map((course) => (
                       <div
                         key={course.code}
-                        onClick={() => handleCourseSelect(course.code)}
+                        onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                        onClick={() => {
+                          setSelectedCourse(course.code);
+                          setCourseSearchTerm('');
+                          setCourseDropdownOpen(false);
+                          setErrors(prev => ({ ...prev, courseYear: undefined }));
+                        }}
                         style={{
                           padding: '10px 12px',
                           cursor: 'pointer',
@@ -637,29 +692,71 @@ const ID: React.FC = () => {
                     setYearSearchTerm(e.target.value);
                     setSelectedYear('');
                     setYearDropdownOpen(true);
+                    // Clear year-related errors when typing
+                    setErrors(prev => ({ ...prev, courseYear: undefined }));
                   }}
                   onClick={() => setYearDropdownOpen(true)}
+                  onBlur={(e) => {
+                    // Delay closing to allow for selection
+                    setTimeout(() => {
+                      setYearDropdownOpen(false);
+                      // If no valid year is selected, clear the search term
+                      if (!selectedYear && yearSearchTerm) {
+                        const exactMatch = yearOptions.find(year => 
+                          year.toLowerCase() === yearSearchTerm.toLowerCase()
+                        );
+                        if (!exactMatch) {
+                          setYearSearchTerm('');
+                          setErrors(prev => ({ 
+                            ...prev, 
+                            courseYear: 'Please select a valid year from the dropdown' 
+                          }));
+                        }
+                      }
+                    }, 200);
+                  }}
                   className={`form-input ${errors.courseYear ? 'error' : ''}`}
                   placeholder="Search for year..."
+                  readOnly={selectedYear !== ''} // Make readonly when year is selected
                 />
+                {selectedYear && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedYear('');
+                      setYearSearchTerm('');
+                      setErrors(prev => ({ ...prev, courseYear: undefined }));
+                    }}
+                    className="clear-button"
+                  >
+                    ×
+                  </button>
+                )}
                 {yearDropdownOpen && (
                   <div style={{ 
                     position: 'absolute', 
                     top: '100%', 
-                    left: 0, 
-                    right: 0, 
+                    left: '0%',
+                    right: 0,
                     backgroundColor: 'white', 
                     border: '1px solid #ddd', 
                     borderRadius: '4px', 
                     maxHeight: '200px', 
                     overflowY: 'auto', 
                     zIndex: 1001,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    maxWidth: '130px'
                   }}>
                     {filteredYears.map((year) => (
                       <div
                         key={year}
-                        onClick={() => handleYearSelect(year)}
+                        onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                        onClick={() => {
+                          setSelectedYear(year);
+                          setYearSearchTerm('');
+                          setYearDropdownOpen(false);
+                          setErrors(prev => ({ ...prev, courseYear: undefined }));
+                        }}
                         style={{
                           padding: '10px 12px',
                           cursor: 'pointer',
