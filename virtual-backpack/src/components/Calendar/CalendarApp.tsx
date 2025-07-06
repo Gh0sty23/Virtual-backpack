@@ -1,19 +1,61 @@
 import React, { useState } from 'react';
 import { Calendar, CalendarEvent } from './Calendar';
 import Notifications from './Notifications';
+import { render } from '@react-email/render';
+import { NewEventNotification } from '../Emails/NewEventNotification';
 
 const CalendarApp: React.FC = () => {
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  // 1. State to track the event selected for editing, from anywhere in the app.
   const [eventToEdit, setEventToEdit] = useState<CalendarEvent | null>(null);
 
-  const handleAddEvent = (newEvent: Omit<CalendarEvent, 'id'>) => {
-    const event: CalendarEvent = {
-      ...newEvent,
-      id: Date.now().toString()
-    };
-    setCalendarEvents(prev => [...prev, event]);
+const handleAddEvent = async (newEventData: Omit<CalendarEvent, 'id'>) => {
+  const newEvent: CalendarEvent = {
+    ...newEventData,
+    id: Date.now().toString()
   };
+  setCalendarEvents(prev => [...prev, newEvent]);
+
+  try {
+    console.log("1. [Frontend] Rendering email component...");
+    const emailHtml = await render(
+      <NewEventNotification
+        title={newEvent.title}
+        date={newEvent.date.toLocaleDateString()}
+        description={newEvent.description}
+      />
+    );
+    console.log("2. [Frontend] Email rendered to HTML. Preparing to send to server.");
+
+    const payload = {
+      to: 'charuzu.kazumi@gmail.com', // <-- location for email
+      subject: `New Event Added: ${newEvent.title}`,
+      html: emailHtml,
+    };
+
+    console.log("3. [Frontend] Sending this payload to server:", payload);
+
+    const response = await fetch('http://localhost:3001/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      console.log("5. [Frontend] SUCCESS: Server responded OK.", responseData);
+      alert('Notification email sent successfully!');
+    } else {
+      console.error("5. [Frontend] ERROR: Server responded with an error.", responseData);
+      alert(`Failed to send email. Server said: ${responseData.error?.message || 'Unknown error'}`);
+    }
+  } catch (error) {
+    console.error('5. [Frontend] CATCH ERROR: A fatal error occurred during fetch.', error);
+    alert('A fatal error occurred. Check the console.');
+  }
+};
 
   const handleEditEvent = (eventId: string, updatedEvent: Omit<CalendarEvent, 'id'>) => {
     setCalendarEvents(prev =>
@@ -33,12 +75,10 @@ const CalendarApp: React.FC = () => {
     setCalendarEvents(loadedEvents);
   };
 
-  // 2. Handler to be called when an event is selected from ANY component.
   const handleEventSelect = (event: CalendarEvent) => {
     setEventToEdit(event);
   };
 
-  // 3. Handler to be called when the modal is closed.
   const handleModalClose = () => {
     setEventToEdit(null);
   };
@@ -51,14 +91,12 @@ const CalendarApp: React.FC = () => {
         onEditEvent={handleEditEvent}
         onDeleteEvent={handleDeleteEvent}
         onEventsLoad={handleEventsLoad}
-        // 4. Pass the new state and handlers down to the Calendar
         eventToEdit={eventToEdit}
         onEventSelect={handleEventSelect}
         onModalClose={handleModalClose}
       />
       <Notifications
         events={calendarEvents}
-        // 5. Pass the select handler to the Notifications sidebar
         onEventSelect={handleEventSelect}
       />
     </>
