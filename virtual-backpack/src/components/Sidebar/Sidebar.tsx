@@ -1,6 +1,8 @@
+
 import './Sidebar.css'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import SaveModule from '../Save/SaveModule'
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
@@ -20,6 +22,9 @@ function Sidebar() {
         <Link to="/calendar">Calendar</Link>
         <Link to="/todo">To-Do list</Link>
         <Link to="/id">ID</Link>
+        <div style={{ marginTop: '2rem' }}>
+          <SaveModule />
+        </div>
       </div>
     </>
   );
