@@ -58,6 +58,11 @@ body, html {
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
 }
 
+.backpack-img:hover {
+  transform:scale(1.1);
+  transition: all 0.3s ease;
+}
+
 .title {
   font-size: 2.5rem;
   font-weight: bold;
