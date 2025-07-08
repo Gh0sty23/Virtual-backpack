@@ -329,9 +329,9 @@ const ID: React.FC = () => {
       newErrors.idPicture = 'ID Picture is required';
     }
 
-    if (!formData.password) {
+    if (!isEditing && !formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
+    } else if (formData.password && formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
@@ -403,23 +403,25 @@ const ID: React.FC = () => {
   };
 
   // Form submission
-  const handleSubmit = () => {
-    if (validateForm()) {
-      const hash = bcrypt.hashSync(formData.password, salt())
-      const dataToSave: IDData = {
-        studentNumber: formData.studentNumber,
-        email: formData.email,
-        name: formData.name,
-        courseYear: formData.courseYear,
-        idPicture: formData.idPicture,
-        password: hash, // In production, this should be hashed
-      };
-      setIdData(dataToSave);
-      localStorage.setItem('VIRTUAL_ID_DATA', JSON.stringify(dataToSave));
-      setCurrentView('display');
-      setIsEditing(false);
-    }
-  };
+const handleSubmit = () => {
+  if (validateForm()) {
+    // Only hash new password if one was provided, otherwise keep existing
+    const passwordToSave = formData.password ? bcrypt.hashSync(formData.password, salt()) : idData.password;
+    
+    const dataToSave: IDData = {
+      studentNumber: formData.studentNumber,
+      email: formData.email,
+      name: formData.name,
+      courseYear: formData.courseYear,
+      idPicture: formData.idPicture,
+      password: passwordToSave,
+    };
+    setIdData(dataToSave);
+    localStorage.setItem('VIRTUAL_ID_DATA', JSON.stringify(dataToSave));
+    setCurrentView('display');
+    setIsEditing(false);
+  }
+};
 
   // Password verification
   const handlePasswordSubmit = () => {
@@ -443,15 +445,16 @@ const ID: React.FC = () => {
   };
 
   // Edit mode handlers
-  const handleEdit = () => {
-    setFormData({
-      ...idData,
-      confirmPassword: idData.password
-    });
-    setIsEditing(true);
-    setCurrentView('form');
-    setErrors({});
-  };
+const handleEdit = () => {
+  setFormData({
+    ...idData,
+    password: '',           // Always empty when editing
+    confirmPassword: ''     // Always empty when editing
+  });
+  setIsEditing(true);
+  setCurrentView('form');
+  setErrors({});
+};
 
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -836,7 +839,7 @@ const ID: React.FC = () => {
           <h3>Security</h3>
 
           <div className="form-group">
-            <label htmlFor="password">Password *</label>
+            <label htmlFor="password">{isEditing ? 'New Password (leave blank to keep current)' : 'Password *'}</label>
             <input
               type="password"
               id="password"
@@ -849,7 +852,7 @@ const ID: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password *</label>
+            <label htmlFor="confirmPassword">{isEditing ? 'Confirm New Password' : 'Confirm Password *'}</label>
             <input
               type="password"
               id="confirmPassword"
