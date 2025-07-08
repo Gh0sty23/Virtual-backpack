@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "email": "email dev --dir src/components/Emails",
-    "server": "node server/index.js"
+    "server": "node server/index.js",
+    "start": "node index.js"
   },
   "dependencies": {
     "@babel/runtime": "^7.26.10",
@@ -20,6 +21,7 @@
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "keypather": "^1.10.1",
+    "nodemailer": "^7.0.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^4.0.17",
