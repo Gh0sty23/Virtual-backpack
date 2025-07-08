@@ -1,19 +1,10 @@
-import { useMemo, useState } from "react"
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Form,
-  Modal,
-  Row,
-  Stack,
-} from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { useMemo, useState } from "react";
+import { Button, Form, Col, Row, Stack, Card, Badge, Modal } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import ReactSelect from "react-select"
-import { Tag } from "../../App"
+import { Tag } from "../../App";
 import styles from "./NotesList.module.css"
-import Sidebar from "../Sidebar/Sidebar"
+import Sidebar from "../Sidebar/Sidebar";
 
 type SimplifiedNote = {
   tags: Tag[]
@@ -115,7 +106,7 @@ export function NoteList({
           </Col>
         </Row>
       </Form>
-      <Row xs={1} sm={2} lg={3} className='g-3'>
+      <Row className="g-3">
         {filteredNotes.map(note => (
           <Col key={note.id}>
             <NoteCard id={note.id} title={note.title} tags={note.tags} />
@@ -145,7 +136,7 @@ function NoteCard({ id, title, tags }: SimplifiedNote) {
           gap={2}
           className="align-items-center justify-content-center h-100"
         >
-          <span className='fs-5 text-truncate w-100 text-center'>{title}</span>
+          <span className="fs-5">{title}</span>
           {tags.length > 0 && (
             <Stack
               gap={1}
